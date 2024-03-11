@@ -47,9 +47,14 @@ document.body.addEventListener("touchstart", function (event) {
     launchBall();
 });
 
-document.body.addEventListener('touchmove', function(event) {
-  event.preventDefault();
-}, { passive: false });
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+  let now = (new Date()).getTime();
+  if (now - lastTouchEnd <= 300) {
+    event.preventDefault();
+  }
+  lastTouchEnd = now;
+}, false);
 
 // adjust the size of the render when the window is resized
 window.addEventListener("resize", function () {
