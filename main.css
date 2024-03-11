@@ -1,0 +1,11 @@
+body {
+    font-family: sans-serif;
+}
+
+
+#gameContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto; /* This makes the div take up the full height of the viewport */
+}
