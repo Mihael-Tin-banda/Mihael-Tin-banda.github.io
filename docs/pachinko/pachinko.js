@@ -194,7 +194,7 @@ const sectionStartY = render.canvas.height - sectionHeight / 2; // start the sec
 for (let i = 0; i < numSections; i++) {
   let score;
   if (i === Math.floor(numSections / 2)) {
-    score = 13; // middle section
+    score = 8; // middle section
   } else if (
     i === Math.floor(numSections / 2) - 1 ||
     i === Math.floor(numSections / 2) + 1
@@ -204,14 +204,14 @@ for (let i = 0; i < numSections; i++) {
     i === Math.floor(numSections / 2) - 2 ||
     i === Math.floor(numSections / 2) + 2
   ) {
-    score = 0.8; // sections around the previous ones
+    score = 0.7; // sections around the previous ones
   } else if (
     i === Math.floor(numSections / 2) - 3 ||
     i === Math.floor(numSections / 2) + 3
   ) {
-    score = 0.4; // sections around the previous ones
+    score = 0.3; // sections around the previous ones
   } else {
-    score = 0.2; // the rest of the sections
+    score = 0.1; // the rest of the sections
   }
   const section = Bodies.rectangle(
     i * sectionWidth + sectionWidth / 2,
