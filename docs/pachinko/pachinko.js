@@ -192,27 +192,27 @@ const borderThickness = 2; // thickness of the borders
 const sections = [];
 const sectionStartY = render.canvas.height - sectionHeight / 2; // start the sections at the bottom of the canvas
 for (let i = 0; i < numSections; i++) {
-    let score;
-    if (i === Math.floor(numSections / 2)) {
-      score = 13; // middle section
-    } else if (
-      i === Math.floor(numSections / 2) - 1 ||
-      i === Math.floor(numSections / 2) + 1
-    ) {
-      score = 1.2; // sections around the middle one
-    } else if (
-      i === Math.floor(numSections / 2) - 2 ||
-      i === Math.floor(numSections / 2) + 2
-    ) {
-      score = 0.8; // sections around the previous ones
-    } else if (
-      i === Math.floor(numSections / 2) - 3 ||
-      i === Math.floor(numSections / 2) + 3
-    ) {
-      score = 0.4; // sections around the previous ones
-    } else {
-      score = 0.2; // the rest of the sections
-    }
+  let score;
+  if (i === Math.floor(numSections / 2)) {
+    score = 13; // middle section
+  } else if (
+    i === Math.floor(numSections / 2) - 1 ||
+    i === Math.floor(numSections / 2) + 1
+  ) {
+    score = 1.2; // sections around the middle one
+  } else if (
+    i === Math.floor(numSections / 2) - 2 ||
+    i === Math.floor(numSections / 2) + 2
+  ) {
+    score = 0.8; // sections around the previous ones
+  } else if (
+    i === Math.floor(numSections / 2) - 3 ||
+    i === Math.floor(numSections / 2) + 3
+  ) {
+    score = 0.4; // sections around the previous ones
+  } else {
+    score = 0.2; // the rest of the sections
+  }
   const section = Bodies.rectangle(
     i * sectionWidth + sectionWidth / 2,
     sectionStartY,
@@ -323,9 +323,13 @@ Events.on(engine, "collisionStart", function (event) {
 
         let ballCost = parseFloat(document.getElementById('ballCost').value);
           // add to the score based on the section
-          score += section.score * ballCost;
-          console.log("Added score: " + section.score); // display the added score in the console
-          document.getElementById("score").textContent = "Score: " + score.toFixed(1);
+          if (section.score !== undefined) {
+            score += section.score * ballCost;
+            console.log("Added score: " + section.score); // display the added score in the console
+            document.getElementById("score").textContent = "Score: " + score.toFixed(1);
+        } else {
+            console.log("Error: section.score is undefined");
+        }
         }
       }
     }
