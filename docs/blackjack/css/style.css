@@ -100,6 +100,8 @@ button.disabled-button, button.secondary.disabled-button {
 	outline-offset: -6px;
 	outline: 6px solid white;
 	box-shadow: -3px 4px rgba(15, 39, 37, .25);
+	width: 100px; /* Adjust this value to change the width of the cards on PC */
+	height: auto;
 }
 
 .card:hover {
@@ -274,6 +276,11 @@ table {
 	.wager-gameplay {
 		top: 0;
 	}
+
+	.card {
+        width: 77px; /* This is the current width of the cards on mobile */
+        height: 103.5px; /* This is the current height of the cards on mobile */
+    }
 }
 
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
@@ -304,8 +311,15 @@ table {
 	}
 
 	.card {
-		width: 77px;
-		height: 103.5px;
+		transition: all 3s;
+		display: inline-block;
+		background-color: none !important;
+		border-radius: 12.5px;
+		outline-offset: -6px;
+		outline: 6px solid white;
+		box-shadow: -3px 4px rgba(15, 39, 37, .25);
+		width: 100px; /* Adjust this value to change the width of the cards on PC */
+		height: 150px; /* Adjust this value to change the height of the cards on PC */
 	}
 
 	#sidebar button {
