@@ -35,11 +35,16 @@ const render = Render.create({
   },
 });
 
-document.body.addEventListener("keydown", "touchstart", function (event) {
-  if (event.code === "Space" || event.code === "Touch") {
+document.body.addEventListener("keydown", function (event) {
+    if (event.code === "Space") {
+        event.preventDefault(); // prevent the default behavior
+        launchBall();
+    }
+});
+
+document.body.addEventListener("touchstart", function (event) {
     event.preventDefault(); // prevent the default behavior
     launchBall();
-  }
 });
 
 // adjust the size of the render when the window is resized
