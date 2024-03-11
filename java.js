@@ -316,7 +316,7 @@ Events.on(engine, "collisionStart", function (event) {
   });
 
 // create a variable to keep track of the score
-let score = 10;
+let score = 50;
 
 // handle collisions
 Events.on(engine, "collisionStart", function (event) {
