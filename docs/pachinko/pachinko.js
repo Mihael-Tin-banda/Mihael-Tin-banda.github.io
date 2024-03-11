@@ -252,13 +252,13 @@ Matter.World.add(engine.world, sections);
 balls = [];
 
 
+
 window.launchBall = function () {
     console.log("launchBall function called");
 
     let ballCost = parseFloat(document.getElementById('ballCost').value); 
 
-    let ballsToLaunch = Math.floor(score / 50);
-    if (ballsToLaunch < 1) ballsToLaunch = 1;
+    let ballsToLaunch = 1; // set the number of balls to launch
   
     for (let i = 0; i < ballsToLaunch; i++) {
       if (score > ballCost) { // check if the score is greater than the cost of a ball
@@ -266,18 +266,20 @@ window.launchBall = function () {
         document.getElementById("score").textContent =
           "Score: " + score.toFixed(1);
   
-        // create a new ball at the current position of the launcher
+        let variation = 100; // replace with the amount of variation you want
+        let randomX = launcher.position.x - variation / 2 + Math.random() * variation;
+
         let newBall = Bodies.circle(
-          launcher.position.x,
+          randomX,
           launcher.position.y,
-        12,
-        {
-          restitution: 0.9,
-          render: {
-            fillStyle: "#f55",
-          },
-        }
-      );
+          12,
+          {
+            restitution: 0.9,
+            render: {
+              fillStyle: "#f55",
+            },
+          }
+        );
 
       // add the new ball to the world
       Matter.World.add(engine.world, newBall);
