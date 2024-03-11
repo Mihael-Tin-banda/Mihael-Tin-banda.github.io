@@ -220,10 +220,11 @@ for (let i = 0; i < numSections; i++) {
     sectionHeight,
     {
       isStatic: true,
-      label: "section" + (i + 1), // give each section a unique label
+      label: "section" + (i + 1) + " - multiplier: " + score, // give each section a unique label
       score: score, // assign a unique score to each section
       render: {
         fillStyle: "#777", // set a fill style to make the sections visible
+        textStyle: "#fff" // set the text color to white
       },
     }
   );
@@ -399,5 +400,6 @@ Events.on(engine, "afterUpdate", function () {
     console.log("The ball has reached the bottom of the screen");
   }
 });
+
 // run the renderer
 Render.run(render);
