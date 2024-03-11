@@ -47,6 +47,10 @@ document.body.addEventListener("touchstart", function (event) {
     launchBall();
 });
 
+document.body.addEventListener('touchmove', function(event) {
+  event.preventDefault();
+}, { passive: false });
+
 // adjust the size of the render when the window is resized
 window.addEventListener("resize", function () {
   render.canvas.width = Math.min(window.innerWidth, 800);
