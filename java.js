@@ -35,8 +35,8 @@ const render = Render.create({
   },
 });
 
-document.body.addEventListener("keydown", function (event) {
-  if (event.code === "Space") {
+document.body.addEventListener("keydown", "touchstart", function (event) {
+  if (event.code === "Space" || event.code === "Touch") {
     event.preventDefault(); // prevent the default behavior
     launchBall();
   }
