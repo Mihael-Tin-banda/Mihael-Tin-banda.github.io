@@ -1,12 +1,12 @@
 let multiply = 1.0;
 let scoreIncrement = 0.2;
-let totalCoins = 100.0; // User's total coins
+let coins = 100.0; // User's total coins
 let currentBet = 0.0; // User's current bet
 let gameActive = false; // Whether the game is currently active
 
 function updateScore() {
     document.getElementById("multiply").textContent = "Multiply: " + multiply.toFixed(1);
-    document.getElementById("coins").textContent = "Coins: " + totalCoins.toFixed(1); // Display total coins
+    document.getElementById("coins").textContent = "Coins: " + coins.toFixed(1); // Display total coins
 }
 
 document.getElementById("placeBetButton").addEventListener("click", function() {
@@ -15,7 +15,7 @@ document.getElementById("placeBetButton").addEventListener("click", function() {
 });
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
-    totalCoins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
+    coins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
     initGame();
 }); 
 
@@ -48,12 +48,12 @@ function placeBet(bet) {
         alert("You must place a bet greater than 0.");
         return;
     }
-    if (bet > totalCoins) {
+    if (bet > coins) {
         alert("You don't have enough coins to place this bet.");
         return;
     }
     currentBet = bet;
-    totalCoins -= bet;
+    coins -= bet;
     updateScore();
     gameActive = true; // Start the game when the bet is placed
     initGame();
@@ -113,9 +113,9 @@ function initGame() {
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
     if (multiply === 1.0) {
-        totalCoins += currentBet; // Return the current bet
+        coins += currentBet; // Return the current bet
     } else {
-        totalCoins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
+        coins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
     }
     stopTimer(); // Stop the timer when the user withdraws
     gameActive = false; // Lock the game when the user withdraws

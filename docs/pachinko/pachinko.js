@@ -10,6 +10,7 @@ document.getElementById('increaseDecost').addEventListener('click', function() {
         ballCost.value = currentCost - 1.0;
     }
 });
+
 // alias for matter.js namespace
 const { Engine, Render, Runner, Bodies, Body, Events } = Matter;
 
@@ -192,26 +193,26 @@ const borderThickness = 2; // thickness of the borders
 const sections = [];
 const sectionStartY = render.canvas.height - sectionHeight / 2; // start the sections at the bottom of the canvas
 for (let i = 0; i < numSections; i++) {
-  let score;
+  let coins;
   if (i === Math.floor(numSections / 2)) {
-    score = 8; // middle section
+    coins = 8; // middle section
   } else if (
     i === Math.floor(numSections / 2) - 1 ||
     i === Math.floor(numSections / 2) + 1
   ) {
-    score = 1.2; // sections around the middle one
+    coins = 1.2; // sections around the middle one
   } else if (
     i === Math.floor(numSections / 2) - 2 ||
     i === Math.floor(numSections / 2) + 2
   ) {
-    score = 0.7; // sections around the previous ones
+    coins = 0.7; // sections around the previous ones
   } else if (
     i === Math.floor(numSections / 2) - 3 ||
     i === Math.floor(numSections / 2) + 3
   ) {
-    score = 0.3; // sections around the previous ones
+    coins = 0.3; // sections around the previous ones
   } else {
-    score = 0.1; // the rest of the sections
+    coins = 0.1; // the rest of the sections
   }
   const section = Bodies.rectangle(
     i * sectionWidth + sectionWidth / 2,
@@ -220,8 +221,8 @@ for (let i = 0; i < numSections; i++) {
     sectionHeight,
     {
       isStatic: true,
-      label: "section" + (i + 1) + " - multiplier: " + score, // give each section a unique label
-      score: score, // assign a unique score to each section
+      label: "section" + (i + 1) + " - multiplier: " + coins, // give each section a unique label
+      coins: coins, // assign a unique coins to each section
       render: {
         fillStyle: "#777", // set a fill style to make the sections visible
         textStyle: "#fff" // set the text color to white
@@ -262,10 +263,10 @@ window.launchBall = function () {
     let ballsToLaunch = 1; // set the number of balls to launch
   
     for (let i = 0; i < ballsToLaunch; i++) {
-      if (score > ballCost) { // check if the score is greater than the cost of a ball
-        score -= ballCost; // subtract the cost of a ball from the score
-        document.getElementById("score").textContent =
-          "Score: " + score.toFixed(1);
+      if (coins > ballCost) { // check if the coins is greater than the cost of a ball
+        coins -= ballCost; // subtract the cost of a ball from the coins
+        document.getElementById("coins").textContent =
+          "Coins: " + coins.toFixed(1);
   
         let variation = 100; // replace with the amount of variation you want
         let randomX = launcher.position.x - variation / 2 + Math.random() * variation;
@@ -323,21 +324,22 @@ Events.on(engine, "collisionStart", function (event) {
           balls.splice(i, 1);
 
         let ballCost = parseFloat(document.getElementById('ballCost').value);
-          // add to the score based on the section
-          if (section.score !== undefined) {
-            score += section.score * ballCost;
-            console.log("Added score: " + section.score); // display the added score in the console
-            document.getElementById("score").textContent = "Score: " + score.toFixed(1);
+          // add to the coins based on the section
+          if (section.coins !== undefined) {
+            coins += section.coins * ballCost;
+            console.log("Added coins: " + section.coins); // display the added coins in the console
+            document.getElementById("coins").textContent = "coins: " + coins.toFixed(1);
         } else {
-            console.log("Error: section.score is undefined");
+            console.log("Error: section.coins is undefined");
         }
         }
       }
     }
   });
 
-// create a variable to keep track of the score
-let score = 50;
+// create a variable to keep track of the coins
+
+let coins = 100.0
 
 // handle collisions
 Events.on(engine, "collisionStart", function (event) {
@@ -348,21 +350,25 @@ Events.on(engine, "collisionStart", function (event) {
 
     if (pair.bodyA === ball) {
       console.log("ball collided with " + pair.bodyB.label);
-      // update the score based on the section the ball collided with
+      // update the coins based on the section the ball collided with
       if (pair.bodyB.label.startsWith("section")) {
-        score += pair.bodyB.score; // use the score assigned to the section
-        document.getElementById("score").textContent =
-          "Score: " + score.toFixed(1); // update the score display
+        if (typeof pair.bodyB.coins === 'number') {
+          coins += pair.bodyB.coins; // use the coins assigned to the section
+          document.getElementById("coins").textContent =
+            "Coins: " + coins.toFixed(1); // update the coins display
         Matter.World.remove(engine.world, ball); // remove the ball from the world
         ball = null; // set the ball to null
+      } else {
+        console.log('Error: pair.bodyB.coins is not a number');
       }
+    }
     } else if (pair.bodyB === ball) {
       console.log("ball collided with " + pair.bodyA.label);
-      // update the score based on the section the ball collided with
+      // update the coins based on the section the ball collided with
       if (pair.bodyA.label.startsWith("section")) {
-        score += pair.bodyA.score; // use the score assigned to the section
-        document.getElementById("score").textContent =
-          "Score: " + score.toFixed(1); // update the score display
+        coins += pair.bodyA.coins; // use the coins assigned to the section
+        document.getElementById("coins").textContent =
+          "Coins: " + coins.toFixed(1); // update the coins display
         Matter.World.remove(engine.world, ball); // remove the ball from the world
         ball = null; // set the ball to null
       }
@@ -379,15 +385,15 @@ Events.on(engine, "collisionStart", function (event) {
 
     if (pair.bodyA === ball) {
       console.log("ball collided with " + pair.bodyB.label);
-      // update the score based on the section the ball collided with
+      // update the coins based on the section the ball collided with
       if (pair.bodyB.label.startsWith("section")) {
-        console.log("Score: " + pair.bodyB.label.slice(7));
+        console.log("Coins: " + pair.bodyB.label.slice(7));
       }
     } else if (pair.bodyB === ball) {
       console.log("ball collided with " + pair.bodyA.label);
-      // update the score based on the section the ball collided with
+      // update the coins based on the section the ball collided with
       if (pair.bodyA.label.startsWith("section")) {
-        console.log("Score: " + pair.bodyA.label.slice(7));
+        console.log("Coins: " + pair.bodyA.label.slice(7));
       }
     }
   }
