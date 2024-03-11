@@ -126,7 +126,7 @@ const spacing = 100; // spacing between pins
 const rows = 8; // number of rows in the grid
 
 // calculate the start coordinates
-const startY = launcher.position.y + launcher.bounds.max.y + spacing * 0; // start the pins below the launcher
+const startY = launcher.position.y + launcher.bounds.max.y + spacing * 0.6; // start the pins below the launcher
 
 // calculate the width of the pyramid
 const pyramidWidth = (rows * 2 - 1) * spacing;
@@ -153,6 +153,12 @@ for (let i = 0; i < rows; i++) {
         Matter.World.add(engine.world, pin);
     }
 }
+
+// Remove the last pin from the pins array
+const lastPin = pins.pop();
+
+// Remove the last pin from the engine.world
+Matter.World.remove(engine.world, lastPin);
 
 // apply a force to the pins
 Events.on(engine, "afterUpdate", function () {
