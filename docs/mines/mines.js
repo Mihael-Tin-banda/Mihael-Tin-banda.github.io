@@ -1,11 +1,11 @@
-let score = 1.0;
+let multiply = 1.0;
 let scoreIncrement = 0.2;
 let totalCoins = 100.0; // User's total coins
 let currentBet = 0.0; // User's current bet
 let gameActive = false; // Whether the game is currently active
 
 function updateScore() {
-    document.getElementById("score").textContent = "Score: " + score.toFixed(1);
+    document.getElementById("multiply").textContent = "Multiply: " + multiply.toFixed(1);
     document.getElementById("coins").textContent = "Coins: " + totalCoins.toFixed(1); // Display total coins
 }
 
@@ -15,11 +15,11 @@ document.getElementById("placeBetButton").addEventListener("click", function() {
 });
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
-    totalCoins += currentBet * score; // Multiply the bet by the score and add it to the total coins
+    totalCoins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
     initGame();
-});
+}); 
 
-let gameDuration = 60; // Duration of the game in seconds
+let gameDuration = 30; // Duration of the game in seconds
 
 function startTimer() {
     let timeRemaining = gameDuration;
@@ -68,7 +68,7 @@ function initGame() {
     }
 
     // Reset the score and score increment
-    score = 1.0;
+    multiply = 1.0;
     scoreIncrement = 0.1;
     updateScore();
 
@@ -100,7 +100,7 @@ function initGame() {
                 gameActive = false; // Lock the game when the user loses
                 initGame();
             } else {
-                score += scoreIncrement;
+                multiply += scoreIncrement;
                 scoreIncrement += 0.2;
                 updateScore();
                 // Change the color of the square
@@ -112,10 +112,10 @@ function initGame() {
 }
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
-    if (score === 1.0) {
+    if (multiply === 1.0) {
         totalCoins += currentBet; // Return the current bet
     } else {
-        totalCoins += currentBet * score; // Multiply the bet by the score and add it to the total coins
+        totalCoins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
     }
     stopTimer(); // Stop the timer when the user withdraws
     gameActive = false; // Lock the game when the user withdraws
