@@ -1,2 +1,2 @@
-# Mihael-Tin-banda.github.io
-Projekt
+# url("Mihael-Tin-banda.github.io")
+Projekt za programersko inzinjerstvo
