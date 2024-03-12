@@ -4,5 +4,9 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    "@tailwindcss/forms",
+    ['prettier-plugin-tailwindcss'],
+    require('tailwindcss'),
+  ],
 }

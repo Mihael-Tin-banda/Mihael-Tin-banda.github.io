@@ -5,44 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steps</title>
     <link rel="stylesheet" href="css/output.css">
+    <link rel="stylesheet" href="css/main.css">
 </head>
-<body class="w-full">
+<body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color">
   <div class="flex justify-between">
-    <h1 class="text-5xl bold-with-space">Steps</h1>
+    <h1 class="text-4xl bold-with-space">Steps</h1>
 
     <p id="coinDisplay">Coins:</p>
   </div>
 
-    <div style="display: flex; justify-content: space-between; width: 100%;">
-      <!-- PACHINKO -->
+  <div class="p-4 grid grid-cols-1 lg:grid-cols-2 gap-4 flex-grow items-center">
+    <!-- PACHINKO -->
 
-      <a href="docs/pachinko/index.html" class="group relative block h-64 sm:h-80 lg:h-96 w-1/2">
-          <span class="absolute inset-0 border-2 border-dashed border-black"></span>
+    <a href="docs/pachinko/index.html" class="group relative block h-full">
+      <span class="absolute inset-0 border-2 border-dashed border-color"></span>
 
-          <div class="relative flex h-full transform items-end border-2 border-black bg-white transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2">
+          <div class="relative flex h-full transform items-end border-2 border-color element-color transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2">
               <div class="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8">            
-              <svg height="100" width="200" style="transform: rotate(0deg); position: absolute; bottom: 80;left: -10">
-                <defs>
-                  <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                    <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:0" />
-                    <stop offset="100%" style="stop-color:rgb(0,0,0);stop-opacity:1" />
-                  </radialGradient>
-                </defs>
-                <circle cx="90" cy="90" r="5" fill="url(#grad1)" />
-                <circle cx="110" cy="90" r="5" fill="url(#grad1)" />
-                <circle cx="80" cy="80" r="5" fill="url(#grad1)" />
-                <circle cx="100" cy="80" r="5" fill="url(#grad1)" />
-                <circle cx="120" cy="80" r="5" fill="url(#grad1)" />
-                <circle cx="70" cy="70" r="5" fill="url(#grad1)" />
-                <circle cx="90" cy="70" r="5" fill="url(#grad1)" />
-                <circle cx="110" cy="70" r="5" fill="url(#grad1)" />
-                <circle cx="130" cy="70" r="5" fill="url(#grad1)" />
-                <circle cx="60" cy="60" r="5" fill="url(#grad1)" />
-                <circle cx="80" cy="60" r="5" fill="url(#grad1)" />
-                <circle cx="100" cy="60" r="5" fill="url(#grad1)" />
-                <circle cx="120" cy="60" r="5" fill="url(#grad1)" />
-                <circle cx="140" cy="60" r="5" fill="url(#grad1)" />
-              </svg>
+              <img src="assets/ikone/pachinko.svg" class="filter-white">
+              
               <h2 class="mt-4 text-xl font-medium sm:text-2xl">Pachinko</h2>
             </div>
           
@@ -60,17 +41,12 @@
 
         <!-- MINESWEPER -->
 
-        <a href="docs/mines/index.html" class="group relative block h-64 sm:h-80 lg:h-96 w-1/2">
-          <span class="absolute inset-0 border-2 border-dashed border-black"></span>
+        <a href="docs/mines/index.html" class="group relative block h-full">
+          <span class="absolute inset-0 border-2 border-dashed border-color"></span>
         
-          <div class="relative flex h-full transform items-end border-2 border-black bg-white transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2">
+          <div class="relative flex h-full transform items-end border-2 border-color element-color transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2">
               <div class="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8">            
-              <svg height="60" width="60">
-                <circle cx="30" cy="30" r="18" fill="black" />
-                <line x1="30" y1="12.6" x2="36" y2="0" style="stroke:brown;stroke-width:1.8" />
-                <polygon points="36,-3 37.2,0 40.2,0 37.8,1.8 39,4.8 36,3 33,4.8 34.2,1.8 31.8,0 34.8,0" fill="red"/>
-                <circle cx="36" cy="1.2" r="1.2" fill="yellow" />
-              </svg>
+              <img src="assets/ikone/bomb.svg" class="filter-white">
             
               <h2 class="mt-4 text-xl font-medium sm:text-2xl">Mines</h2>
             </div>
@@ -86,36 +62,16 @@
             </div>
           </div>
         </a>
-      </div>
+  
 
       <!-- BLACK JACK -->
 
-      <a href="docs/blackjack/index.html" class="group relative block h-64 sm:h-80 lg:h-96 w-1/2">
-        <span class="absolute inset-0 border-2 border-dashed border-black"></span>
+      <a href="docs/blackjack/index.html" class="group relative block h-full">
+        <span class="absolute inset-0 border-2 border-dashed border-color"></span>
       
-        <div class="relative flex h-full transform items-end border-2 border-black bg-white transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2">
+        <div class="relative flex h-full transform items-end border-2 border-color element-color transition-transform group-hover:-translate-x-2 group-hover:-translate-y-2">
             <div class="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8">            
-            <svg height="60" width="60" style="transform: rotate(-5deg); position: absolute; bottom: 100;left: 30">
-              <defs>
-                <linearGradient id="redCardGradient" x1="100%" y1="0%" x2="0%" y2="0%">
-                  <stop offset="0%" style="stop-color:red;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:pink;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <rect width="84" height="120" style="fill:url(#redCardGradient);stroke-width:2;stroke:red" />
-              <text x="12" y="21" font-size="21" text-anchor="middle" fill="red">A</text>
-            </svg>
-
-            <svg height="60" width="60" style="margin-left:20px; transform: rotate(5deg); position: absolute; bottom: 95; left: 35">
-              <defs>
-                <linearGradient id="blackCardGradient" x1="100%" y1="0%" x2="0%" y2="0%">
-                  <stop offset="0%" style="stop-color:black;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:gray;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <rect width="84" height="120" style="fill:url(#blackCardGradient);stroke-width:2;stroke:black" />
-              <text x="12" y="21" font-size="21" text-anchor="middle" fill="black">A</text>
-            </svg>
+            <img src="assets/ikone/playing-cards.svg" class="filter-white">
             <h2 class="mt-4 text-xl font-medium sm:text-2xl">Black Jack</h2>
           </div>
         

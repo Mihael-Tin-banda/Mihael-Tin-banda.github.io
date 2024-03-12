@@ -1,0 +1,20 @@
+body {
+    color: aliceblue;
+}
+
+.filter-white {
+    filter: invert(99%) sepia(15%) saturate(261%) hue-rotate(49deg) brightness(98%) contrast(106%);
+}
+
+.bg-color {
+    background-color: #18181d;
+    
+}
+
+.element-color {
+    background-color: #18181d;
+}
+
+.border-color {
+    border-color: #f7fff7;
+}
