@@ -1,0 +1,22 @@
+body {
+    background-color: #18181D;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+#authorizeButton {
+    border: 2px solid white;
+    color: white;
+    background-color: transparent;
+    padding: 20px 40px;
+    font-size: 1.5em;
+    position: relative;
+    transition: top ease 0.5s;
+}
+
+#authorizeButton:hover {
+    top: -10px;
+}
