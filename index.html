@@ -149,6 +149,18 @@
           })
           .then(response => response.json())
           .then(data => {
+            console.log(data); // Add this line to check the data returned from the Fitbit API
+            var steps = data['activities-steps'][0].value;
+            var newCoins = steps / 100;
+            var coinDisplayText = document.getElementById('coinDisplay').innerText;
+            var currentCoins = 0;
+            if (coinDisplayText.includes(": ")) {
+              currentCoins = parseFloat(coinDisplayText.split(": ")[1]);
+            }
+            var totalCoins = currentCoins + newCoins;
+            document.getElementById('coinDisplay').innerText = "Coins: " + totalCoins;
+          })
+          .then(data => {
             var steps = data['activities-steps'][0].value;
             var newCoins = steps / 100;
             var currentCoins = parseFloat(document.getElementById('coinDisplay').innerText.split(": ")[1]);

@@ -25,12 +25,14 @@ document.getElementById('authorizeButton').addEventListener('click', function() 
             .then(data => {
                 var steps = data['activities-steps'][0].value;
                 var newCoins = steps / 100;
-                var currentCoins = parseFloat(document.getElementById('coinDisplay').innerText.split(": ")[1]);
+                var coinDisplayText = document.getElementById('coinDisplay').innerText;
+                var currentCoins = 0;
+                if (coinDisplayText.includes(": ")) {
+                    currentCoins = parseFloat(coinDisplayText.split(": ")[1]);
+                }
                 var totalCoins = currentCoins + newCoins;
                 document.getElementById('coinDisplay').innerText = "Coins: " + totalCoins;
             })
-            .catch(error => console.error('Error:', error));
-        });
     } else {
         window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=profile activity&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
     }
