@@ -13,8 +13,8 @@ document.getElementById('authorizeButton').addEventListener('click', function() 
         })
         .then(response => response.json())
         .then(data => {
-            var access_token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JUNVgiLCJzdWIiOiJCWjRLRkgiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJ3YWN0IHdwcm8iLCJleHAiOjE3MTAyOTI3NzEsImlhdCI6MTcxMDI2Mzk3MX0.uAgLFZThl2rbJ-UsPRaFYA8SBFU0o5J1LBm-NuULtWI";
-            var refresh_token = "e94a3e5bc3535524b7be924724484528286b1262b140ea4875a396dad8a72030";
+            var access_token = data.access_token; // Use the access token from the response
+            var refresh_token = data.refresh_token; // Use the refresh token from the response
 
             fetch('https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json', {
                 headers: {
