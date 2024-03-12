@@ -8,21 +8,40 @@
     <link rel="stylesheet" href="css/main.css" />
   </head>
 
-  <body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color cutive-mono-regular">
+  <body
+    class="w-full h-screen flex flex-col justify-between overflow-auto bg-color"
+  >
+    <div class="flex justify-between">
+      <h1 class="text-4xl bold-with-space">Steps</h1>
 
-    <!-- NAV -->
-    <div class="flex justify-between items-center relative">
-      <p id="coinDisplay" class="border-color border-2 p-2 border-dashed ml-2">Coins: 0.0</p>
+      <style>
+      .button {
+        border: 2px solid white;
+        background-color: #18181D;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        box-shadow: 0 5px #666;
+        transition: background-color 0.3s, color 0.3s;
+      }
 
-      <h1 class="text-5xl absolute left-1/2 transform -translate-x-1/2">"STEPS"</h1>
+      .button:active {
+        background-color: #24242b;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+      }
+      </style>
 
-      <div class="flex">
-        <button id="authorizeButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Authorize Fitbit</button>
-        <button id="getStepsButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Get Steps</button>
-      </div>
+      <button class="button" id="authorizeButton">Authorize Fitbit</button>
+      <button class="button" id="getStepsButton">Get Steps</button>
+
+      <p id="coinDisplay">Coins:</p>
     </div>
-
-    <!-- SECTION -->
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3">
       <!-- PACHINKO -->
@@ -43,19 +62,19 @@
           >
             <img src="assets/ikone/pachinko.svg" class="filter-white" />
 
-            <h2 class="mt-4 text-xl sm:text-2xl">Pachinko</h2>
+            <h2 class="mt-4 text-xl font-medium sm:text-2xl">Pachinko</h2>
           </div>
 
           <div
             class="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
           >
-            <h3 class="mt-4 text-xl sm:text-2xl">Pachinko</h3>
+            <h3 class="mt-4 text-xl font-medium sm:text-2xl">Pachinko</h3>
 
             <p class="mt-4 text-sm sm:text-base">
               Suck the balls into the hole and win the game.
             </p>
 
-            <p class="mt-8 font-bold border-color border-2 p-2 border-dashed w-fit hover:bg-red-500">Press</p>
+            <p class="mt-8 font-bold">Press</p>
           </div>
         </div>
       </a>
@@ -75,19 +94,19 @@
           >
             <img src="assets/ikone/bomb.svg" class="filter-white" />
 
-            <h2 class="mt-4 text-xl sm:text-2xl">Mines</h2>
+            <h2 class="mt-4 text-xl font-medium sm:text-2xl">Mines</h2>
           </div>
 
           <div
             class="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
           >
-            <h3 class="mt-4 text-xl sm:text-2xl">Mines</h3>
+            <h3 class="mt-4 text-xl font-medium sm:text-2xl">Mines</h3>
 
             <p class="mt-4 text-sm sm:text-base">
               Mines are everywhere. You have to find them and avoid them.
             </p>
 
-            <p class="mt-8 font-bold border-color border-2 p-2 border-dashed w-fit hover:bg-red-500">Press</p>
+            <p class="mt-8 font-bold">Press</p>
           </div>
         </div>
       </a>
@@ -109,20 +128,20 @@
           >
             <img src="assets/ikone/playing-cards.svg" class="filter-white" />
 
-            <h2 class="mt-4 text-xl sm:text-2xl">Black Jack</h2>
+            <h2 class="mt-4 text-xl font-medium sm:text-2xl">Black Jack</h2>
           </div>
 
           <div
             class="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
           >
-            <h3 class="mt-4 text-xl sm:text-2xl">Black Jack</h3>
+            <h3 class="mt-4 text-xl font-medium sm:text-2xl">Black Jack</h3>
 
             <p class="mt-4 text-sm sm:text-base">
               Jack Black is a great actor and a great musician. He is also a
               great game.
             </p>
 
-            <p class="mt-8 font-bold border-color border-2 p-2 border-dashed w-fit hover:bg-red-500">Press</p>
+            <p class="mt-8 font-bold">Press</p>
           </div>
         </div>
       </a>
@@ -130,53 +149,51 @@
     <script src="js/main.js"></script>
     <script>
     document.getElementById('authorizeButton').addEventListener('click', function() {
-      var urlParams = new URLSearchParams(window.location.search);
-      var code = urlParams.get('code');
+        var urlParams = new URLSearchParams(window.location.search);
+        var code = urlParams.get('code');
 
-      if (code) {
-        fetch('https://api.fitbit.com/oauth2/token', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`23RT5X` + ':' + `579d36577af143adf1e504fa3ccb47aa`),
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=https://mihael-tin-banda.github.io'
-        })
-        .then(response => response.json())
-        .then(data => {
-          var access_token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JUNVgiLCJzdWIiOiJCWjRLRkgiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJ3YWN0IHdwcm8iLCJleHAiOjE3MTAyOTI3NzEsImlhdCI6MTcxMDI2Mzk3MX0.uAgLFZThl2rbJ-UsPRaFYA8SBFU0o5J1LBm-NuULtWI";
-          var refresh_token = "e94a3e5bc3535524b7be924724484528286b1262b140ea4875a396dad8a72030";
+        if (!code) {
+            window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=profile activity&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
+        }
+    });
 
-          fetch('https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json', {
-            headers: {
-              'Authorization': 'Bearer ' + access_token
-            }
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data); // Add this line to check the data returned from the Fitbit API
-            var steps = data['activities-steps'][0].value;
-            var newCoins = steps / 100;
-            var coinDisplayText = document.getElementById('coinDisplay').innerText;
-            var currentCoins = 0;
-            if (coinDisplayText.includes(": ")) {
-              currentCoins = parseFloat(coinDisplayText.split(": ")[1]);
-            }
-            var totalCoins = currentCoins + newCoins;
-            document.getElementById('coinDisplay').innerText = "Coins: " + totalCoins;
-          })
-          .then(data => {
-            var steps = data['activities-steps'][0].value;
-            var newCoins = steps / 100;
-            var currentCoins = parseFloat(document.getElementById('coinDisplay').innerText.split(": ")[1]);
-            var totalCoins = currentCoins + newCoins;
-            document.getElementById('coinDisplay').innerText = "Coins: " + totalCoins;
-          })
-          .catch(error => console.error('Error:', error));
-        });
-      } else {
-        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=profile activity&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
-      }
+    document.getElementById('getStepsButton').addEventListener('click', function() {
+        var urlParams = new URLSearchParams(window.location.search);
+        var code = urlParams.get('code');
+
+        if (code) {
+            fetch('https://api.fitbit.com/oauth2/token', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + btoa(`23RT5X` + ':' + `579d36577af143adf1e504fa3ccb47aa`),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=https://mihael-tin-banda.github.io'
+            })
+            .then(response => response.json())
+            .then(data => {
+                var access_token = data.access_token; // Use the access token from the response
+
+                fetch('https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json', {
+                    headers: {
+                        'Authorization': 'Bearer ' + access_token
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var steps = data['activities-steps'][0].value;
+                    var newCoins = steps / 100;
+                    var coinDisplayText = document.getElementById('coinDisplay').innerText;
+                    var currentCoins = 0;
+                    if (coinDisplayText.includes(": ")) {
+                        currentCoins = parseFloat(coinDisplayText.split(": ")[1]);
+                    }
+                    var totalCoins = currentCoins + newCoins;
+                    document.getElementById('coinDisplay').innerText = "Coins: " + totalCoins;
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        }
     });
     </script>
   </body>
