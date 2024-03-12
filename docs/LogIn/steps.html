@@ -42,6 +42,22 @@
                 var coins = localStorage.getItem('steps') / 100;
                 localStorage.setItem('coins', coins);
 
+                // Save user data in an object
+                var userData = {
+                    userName: userName,
+                    coins: coins,
+                    steps: steps
+                };
+
+                // Get the current user data from localStorage
+                var currentUserData = JSON.parse(localStorage.getItem('userData')) || [];
+
+                // Add the new user data to the current user data
+                currentUserData.push(userData);
+
+                // Save the updated user data back to localStorage
+                localStorage.setItem('userData', JSON.stringify(currentUserData));
+
                 // Redirect to the specified URL with coins and username as query parameters
                 window.location.href = 'https://mihael-tin-banda.github.io/index.html?coins=' + encodeURIComponent(coins) + '&username=' + encodeURIComponent(userName);
             })
