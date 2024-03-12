@@ -96,9 +96,6 @@ button.disabled-button, button.secondary.disabled-button {
 	transition: all 3s;
 	display: inline-block;
 	background-color: none !important;
-	border-radius: 12.5px;
-	outline-offset: -6px;
-	outline: 6px solid white;
 	box-shadow: -3px 4px rgba(15, 39, 37, .25);
 	width: 100px; /* Adjust this value to change the width of the cards on PC */
 	height: auto;
@@ -246,10 +243,6 @@ table {
 	font-size: 1.5em !important;
 }
 
-.rules-nav { /* Icon to toggle rules */
-	padding-right: 20px !important;
-}
-
 .modal { 
 	padding: 40px 0 !important;
 	width: 75% !important; 
@@ -314,9 +307,6 @@ table {
 		transition: all 3s;
 		display: inline-block;
 		background-color: none !important;
-		border-radius: 12.5px;
-		outline-offset: -6px;
-		outline: 6px solid white;
 		box-shadow: -3px 4px rgba(15, 39, 37, .25);
 		width: 100px; /* Adjust this value to change the width of the cards on PC */
 		height: 150px; /* Adjust this value to change the height of the cards on PC */
