@@ -40,9 +40,15 @@
                 var userName = data.user.displayName;
                 localStorage.setItem('userName', userName);
 
+                console.log('Username:', userName); // Add this line
+
+
                 // Calculate coins and save it in local storage
                 var coins = localStorage.getItem('steps') / 100;
                 localStorage.setItem('coins', coins);
+
+                console.log('Coins:', coins); // Add this line
+
 
                 // Save user data in an object
                 var userData = {
@@ -61,8 +67,7 @@
                 localStorage.setItem('userData', JSON.stringify(currentUserData));
 
                 // Redirect to the specified URL with coins and username as query parameters
-                window.location.href = 'https://mihael-tin-banda.github.io?coins=' + encodeURIComponent(coins) + '&username=' + encodeURIComponent(userName);
-            })
+                window.location.href = 'https://mihael-tin-banda.github.io/index.html?coins=' + encodeURIComponent(coins) + '&username=' + encodeURIComponent(userName);            })
             .catch(error => console.error('Error:', error));
         };
     </script>
