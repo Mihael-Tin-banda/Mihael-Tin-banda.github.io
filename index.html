@@ -121,5 +121,50 @@
       </a>
     </div>
     <script src="js/main.js"></script>
+    <script>
+      // Step 1: Redirect the user to the Fitbit authorization page
+      window.onload = function() {
+        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
+      };
+
+      // Step 2: The user is redirected back to your redirect_uri with a code in the URL
+      // This code should be run on the page at your redirect_uri
+      var urlParams = new URLSearchParams(window.location.search);
+      var code = urlParams.get('code');
+
+      if (code) {
+        // Step 3: Exchange the authorization code for an access token and refresh token
+        fetch('https://api.fitbit.com/oauth2/token', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Basic ' + btoa(`23RT5X` + ':' + `579d36577af143adf1e504fa3ccb47aa`),
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=https://mihael-tin-banda.github.io'
+        })
+        .then(response => response.json())
+        .then(data => {
+          var access_token = data.access_token;
+          var refresh_token = data.refresh_token;
+
+          // Step 4: Use the access token to get the user's step data
+          fetch('https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json', {
+            headers: {
+              'Authorization': 'Bearer ' + access_token
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            var steps = data['activities-steps'][0].value;
+
+            // Step 5: Add the number of steps to the user's coin value
+            // This depends on how you're storing the user's coin value
+            // For example, if you're storing it in a variable:
+            var coins = 0;
+            coins += parseInt(steps);
+          });
+        });
+    };
+    </script>
   </body>
-</html>
+  </html>
