@@ -9,11 +9,6 @@
   </head>
 
   <body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color cutive-mono-regular">
-
-
-
-
-
     <!-- NAV -->
     <div class="flex justify-between items-center relative">
       <p id="coinDisplay" class="border-color border-2 p-2 border-dashed ml-2">Coins: 0.0</p>
@@ -21,8 +16,7 @@
       <h1 class="text-5xl absolute left-1/2 transform -translate-x-1/2">"STEPS"</h1>
 
       <div class="flex">
-        <button id="authorizeButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Mihael-Tin</button>
-        <button id="getStepsButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Banda</button>
+        <button id="userName" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">userName:</button>
       </div>
     </div>
 
@@ -132,5 +126,15 @@
       </a>
     </div>
     <script src="js/main.js"></script>
+    <script>
+      // Get the query parameters from the URL
+      var urlParams = new URLSearchParams(window.location.search);
+      var coins = urlParams.get('coins');
+      var userName = urlParams.get('username');
+
+      // Set the text of the coinDisplay and userName elements
+      document.getElementById('coinDisplay').textContent = 'Coins: ' + coins;
+      document.getElementById('userName').textContent = 'userName: ' + userName;
+    </script>
   </body>
 </html>
