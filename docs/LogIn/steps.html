@@ -10,8 +10,9 @@
 <body>
     <script>
         window.onload = function() {
-            // Use the provided access token
-            var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JUNVgiLCJzdWIiOiJCWjRLRkgiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJ3YWN0IHdwcm8iLCJleHAiOjE3MTAzMDY3ODEsImlhdCI6MTcxMDI3Nzk4MX0.FfcpwEyfUEVO3vjNpbJzy-C_wMIQvgABcR--_Mu5GRE';
+            // Get the access token from the query parameters
+            var urlParams = new URLSearchParams(window.location.search);
+            var access_token = urlParams.get('access_token');
             var steps;
 
             // Fetch the step data
