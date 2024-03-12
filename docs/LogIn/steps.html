@@ -13,6 +13,7 @@
             // Get the access token from the query parameters
             var urlParams = new URLSearchParams(window.location.search);
             var access_token = urlParams.get('access_token');
+            console.log('Access token:', access_token);
             var steps;
 
             // Fetch the step data
@@ -21,7 +22,12 @@
                     'Authorization': 'Bearer ' + access_token
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('API request failed with status ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 // Save the step data in local storage
                 steps = data['activities-steps'][0].value;
