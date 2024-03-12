@@ -56,8 +56,8 @@ function placeBet(bet) {
     coins -= bet;
     updateScore();
     gameActive = true; // Start the game when the bet is placed
-    initGame();
-    startTimer();
+    initGame(); // Reset the game
+    startTimer(); // Start the timer
 }
 
 function initGame() {
@@ -104,7 +104,7 @@ function initGame() {
                 scoreIncrement += 0.2;
                 updateScore();
                 // Change the color of the square
-                square.style.backgroundColor = "green";
+                square.style.backgroundColor = "#18181d";
             }
         });
         minefield.appendChild(square);
@@ -119,6 +119,8 @@ document.getElementById("withdrawButton").addEventListener("click", function() {
     }
     stopTimer(); // Stop the timer when the user withdraws
     gameActive = false; // Lock the game when the user withdraws
+    currentBet = 0; // Reset the current bet
+    initGame(); // Reset the game state
 });
 
 // Initialize the game on page load
