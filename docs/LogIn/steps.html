@@ -61,7 +61,7 @@
                 localStorage.setItem('userData', JSON.stringify(currentUserData));
 
                 // Redirect to the specified URL with coins and username as query parameters
-                window.location.href = 'https://mihael-tin-banda.github.io/index.html?coins=' + encodeURIComponent(coins) + '&username=' + encodeURIComponent(userName);
+                window.location.href = 'https://mihael-tin-banda.github.io?coins=' + encodeURIComponent(coins) + '&username=' + encodeURIComponent(userName);
             })
             .catch(error => console.error('Error:', error));
         };
