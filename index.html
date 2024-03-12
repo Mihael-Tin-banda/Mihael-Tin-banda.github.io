@@ -126,8 +126,8 @@
     <script>
       // Step 1: Redirect the user to the Fitbit authorization page
       document.getElementById('authorizeButton').addEventListener('click', function() {
-        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=http://localhost:8553&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
-      };
+        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=http://localhost:8553s&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
+      });
 
       // Step 2: The user is redirected back to your redirect_uri with a code in the URL
       // This code should be run on the page at your redirect_uri

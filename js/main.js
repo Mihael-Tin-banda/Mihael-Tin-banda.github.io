@@ -34,4 +34,4 @@ document.getElementById('authorizeButton').addEventListener('click', function() 
     } else {
         window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=http://localhost:8553&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
     }
-};
+}); // Add closing parenthesis here
