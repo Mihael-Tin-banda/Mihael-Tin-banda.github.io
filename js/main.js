@@ -38,3 +38,23 @@ document.getElementById('authorizeButton').addEventListener('click', function() 
         window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=profile activity&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
     }
 });
+fetch('https://api.fitbit.com/oauth2/token', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Basic ' + btoa(`23RT5X` + ':' + `579d36577af143adf1e504fa3ccb47aa`),
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=https://mihael-tin-banda.github.io'
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
+    }
+    return response.json();
+})
+.then(data => {
+    // Handle the data
+})
+.catch(error => {
+    console.error('There has been a problem with your fetch operation:', error);
+});
