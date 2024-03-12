@@ -1,35 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Steps</title>
-        <link rel="stylesheet" href="css/main.css" />
-    </head>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #18181D;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.getElementById('authorizeButton').addEventListener('click', function() {
+            // Start the OAuth 2.0 flow
+            var client_id = 'YOUR_CLIENT_ID'; // Your OAuth 2.0 Client ID
+            var redirect_uri = 'YOUR_REDIRECT_URI'; // Your Redirect URL
+            var response_type = 'code'; // Change this to 'code'
+            var scope = 'activity profile';
 
-    <body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color cutive-mono-regular">
+            var authorizationUrl = 'https://www.fitbit.com/oauth2/authorize?' +
+                'response_type=' + encodeURIComponent(response_type) +
+                '&client_id=' + encodeURIComponent(client_id) +
+                '&redirect_uri=' + encodeURIComponent(redirect_uri) +
+                '&scope=' + encodeURIComponent(scope);
 
-            <div>
-                <button id="authorizeButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Authorize Fitbit</button>
-            </div>
-        </div>
-        <script>
-            document.getElementById('authorizeButton').addEventListener('click', function() {
-                // Start the OAuth 2.0 flow
-                var client_id = '23RT5X'; // Your OAuth 2.0 Client ID
-                var redirect_uri = 'https://mihael-tin-banda.github.io/docs/LogIn/steps.html'; // Your Redirect URL
-                var response_type = 'token'; // Change this to 'token'
-                var scope = 'activity profile';
-
-                var authorizationUrl = 'https://www.fitbit.com/oauth2/authorize?' +
-                    'response_type=' + encodeURIComponent(response_type) +
-                    '&client_id=' + encodeURIComponent(client_id) +
-                    '&redirect_uri=' + encodeURIComponent(redirect_uri) +
-                    '&scope=' + encodeURIComponent(scope);
-
-                // Redirect the user to the Fitbit authorization page
-                window.location.href = authorizationUrl;
-            });
-        </script>
-    </body>
+            // Redirect the user to the Fitbit authorization page
+            window.location.href = authorizationUrl;
+        });
+    </script>
+</body>
 </html>
