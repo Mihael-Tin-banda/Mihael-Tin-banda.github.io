@@ -14,6 +14,8 @@
     <div class="flex justify-between">
       <h1 class="text-4xl bold-with-space">Steps</h1>
 
+      <button id="authorizeButton">Authorize Fitbit</button>
+
       <p id="coinDisplay">Coins:</p>
     </div>
 
@@ -123,8 +125,8 @@
     <script src="js/main.js"></script>
     <script>
       // Step 1: Redirect the user to the Fitbit authorization page
-      window.onload = function() {
-        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
+      document.getElementById('authorizeButton').addEventListener('click', function() {
+        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=http://localhost:8553&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
       };
 
       // Step 2: The user is redirected back to your redirect_uri with a code in the URL
@@ -140,7 +142,7 @@
             'Authorization': 'Basic ' + btoa(`23RT5X` + ':' + `579d36577af143adf1e504fa3ccb47aa`),
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=https://mihael-tin-banda.github.io'
+          body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=http://localhost:8553'
         })
         .then(response => response.json())
         .then(data => {
