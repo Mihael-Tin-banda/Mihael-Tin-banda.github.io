@@ -126,7 +126,7 @@
     <script>
       // Step 1: Redirect the user to the Fitbit authorization page
       document.getElementById('authorizeButton').addEventListener('click', function() {
-        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=activity&redirect_uri=http://localhost:8553s&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
+        window.location.href = `https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=23RT5X&scope=cardio_fitness location oxygen_saturation temperature electrocardiogram weight sleep settings nutrition activity heartrate profile social respiratory_rate&redirect_uri=https://mihael-tin-banda.github.io&state=2w6v1l1h502m0o4d006t242s095y6w2g`;
       });
 
       // Step 2: The user is redirected back to your redirect_uri with a code in the URL
@@ -142,7 +142,7 @@
             'Authorization': 'Basic ' + btoa(`23RT5X` + ':' + `579d36577af143adf1e504fa3ccb47aa`),
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: 'grant_type=authorization_code&code=' + code + '&redirect_uri=http://localhost:8553'
+          body: 'grant_type=https://www.fitbit.com/oauth2/authorize&code=' + code + '&redirect_uri=https://mihael-tin-banda.github.io'
         })
         .then(response => response.json())
         .then(data => {
