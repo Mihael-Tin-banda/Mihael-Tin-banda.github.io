@@ -10,10 +10,11 @@
 <body>
     <script>
         window.onload = function() {
-            // Get the access token from the query parameters
-            var urlParams = new URLSearchParams(window.location.search);
+            // Get the access token from the URL fragment
+            var urlParams = new URLSearchParams(window.location.hash.substring(1));
             var access_token = urlParams.get('access_token');
             console.log('Access token:', access_token);
+
             var steps;
 
             // Fetch the step data
