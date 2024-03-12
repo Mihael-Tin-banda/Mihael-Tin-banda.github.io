@@ -11,7 +11,12 @@ function updateScore() {
 
 document.getElementById("placeBetButton").addEventListener("click", function() {
     let bet = parseFloat(document.getElementById("betInput").value);
-    placeBet(bet);
+    
+    if (bet > 0){
+        placeBet(bet);
+        this.style.display = 'none'; // Hide the placeBetButton
+        document.getElementById("withdrawButton").style.display = 'block'; // Show the withdrawButton
+    }
 });
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
@@ -44,10 +49,6 @@ function stopTimer() {
 }
 
 function placeBet(bet) {
-    if (bet <= 0) {
-        alert("You must place a bet greater than 0.");
-        return;
-    }
     if (bet > coins) {
         alert("You don't have enough coins to place this bet.");
         return;
@@ -113,6 +114,7 @@ function initGame() {
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
     if (multiply === 1.0) {
+        coins -= currentBet; // Return the current bet
         coins += currentBet; // Return the current bet
     } else {
         coins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
@@ -121,6 +123,8 @@ document.getElementById("withdrawButton").addEventListener("click", function() {
     gameActive = false; // Lock the game when the user withdraws
     currentBet = 0; // Reset the current bet
     initGame(); // Reset the game state
+    this.style.display = 'none'; // Hide the withdrawButton
+    document.getElementById("placeBetButton").style.display = 'block'; // Show the placeBetButton
 });
 
 // Initialize the game on page load
