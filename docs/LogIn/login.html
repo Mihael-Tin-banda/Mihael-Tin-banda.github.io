@@ -10,19 +10,8 @@
 
   <body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color cutive-mono-regular">
 
-
-
-
-
-    <!-- NAV -->
-    <div class="flex justify-between items-center relative">
-      <p id="coinDisplay" class="border-color border-2 p-2 border-dashed ml-2">Coins: 0.0</p>
-
-      <h1 class="text-5xl absolute left-1/2 transform -translate-x-1/2">"STEPS"</h1>
-
-      <div class="flex">
+      <div>
         <button id="authorizeButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Authorize Fitbit</button>
-        <button id="getStepsButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Get Steps</button>
       </div>
     </div>
     <script>
@@ -56,7 +45,7 @@
                     .then(data => {
                         // Update the global variable
                         window.coins = data['activities-steps'][0].value;
-                        document.getElementById('coinDisplay').textContent = "Coins: " + window.coins;
+                        console.log("Steps: " + window.coins);
                     })
                     .catch(error => console.error('Error:', error));
                 })
