@@ -10,9 +10,10 @@
 <body>
     <script>
         window.onload = function() {
-            // Get the access token from wherever you have stored it
-            var access_token = localStorage.getItem('access_token');
+            // Use the provided access token
+            var access_token = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JUNVgiLCJzdWIiOiJCWjRLRkgiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJ3YWN0IHdwcm8iLCJleHAiOjE3MTAzMDY3ODEsImlhdCI6MTcxMDI3Nzk4MX0.FfcpwEyfUEVO3vjNpbJzy-C_wMIQvgABcR--_Mu5GRE';
 
+            // Fetch the step data
             fetch('https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json', {
                 headers: {
                     'Authorization': 'Bearer ' + access_token
@@ -21,7 +22,25 @@
             .then(response => response.json())
             .then(data => {
                 // Save the step data in local storage
-                localStorage.setItem('steps', data['activities-steps'][0].value);
+                var steps = data['activities-steps'][0].value;
+                localStorage.setItem('steps', steps);
+
+                // Fetch the user profile information
+                return fetch('https://api.fitbit.com/1/user/-/profile.json', {
+                    headers: {
+                        'Authorization': 'Bearer ' + access_token
+                    }
+                });
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Save the user name in local storage
+                var userName = data.user.displayName;
+                localStorage.setItem('userName', userName);
+
+                // Calculate coins and save it in local storage
+                var coins = localStorage.getItem('steps') / 100;
+                localStorage.setItem('coins', coins);
 
                 // Redirect to index.html
                 window.location.href = 'index.html';
