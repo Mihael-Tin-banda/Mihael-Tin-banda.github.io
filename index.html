@@ -8,40 +8,25 @@
     <link rel="stylesheet" href="css/main.css" />
   </head>
 
-  <body
-    class="w-full h-screen flex flex-col justify-between overflow-auto bg-color"
-  >
-    <div class="flex justify-between">
-      <h1 class="text-4xl bold-with-space">Steps</h1>
+  <body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color cutive-mono-regular">
 
-      <style>
-      .button {
-        border: 2px solid white;
-        background-color: #18181D;
-        color: white;
-        padding: 15px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        box-shadow: 0 5px #666;
-        transition: background-color 0.3s, color 0.3s;
-      }
 
-      .button:active {
-        background-color: #24242b;
-        box-shadow: 0 5px #666;
-        transform: translateY(4px);
-      }
-      </style>
 
-      <button class="button" id="authorizeButton">Authorize Fitbit</button>
-      <button class="button" id="getStepsButton">Get Steps</button>
 
-      <p id="coinDisplay">Coins:</p>
+
+    <!-- NAV -->
+    <div class="flex justify-between items-center relative">
+      <p id="coinDisplay" class="border-color border-2 p-2 border-dashed ml-2">Coins: 0.0</p>
+
+      <h1 class="text-5xl absolute left-1/2 transform -translate-x-1/2">"STEPS"</h1>
+
+      <div class="flex">
+        <button id="authorizeButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Authorize Fitbit</button>
+        <button id="getStepsButton" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Get Steps</button>
+      </div>
     </div>
+
+    <!-- SECTION -->
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3">
       <!-- PACHINKO -->
@@ -62,19 +47,19 @@
           >
             <img src="assets/ikone/pachinko.svg" class="filter-white" />
 
-            <h2 class="mt-4 text-xl font-medium sm:text-2xl">Pachinko</h2>
+            <h2 class="mt-4 text-xl sm:text-2xl">Pachinko</h2>
           </div>
 
           <div
             class="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
           >
-            <h3 class="mt-4 text-xl font-medium sm:text-2xl">Pachinko</h3>
+            <h3 class="mt-4 text-xl sm:text-2xl">Pachinko</h3>
 
             <p class="mt-4 text-sm sm:text-base">
               Suck the balls into the hole and win the game.
             </p>
 
-            <p class="mt-8 font-bold">Press</p>
+            <p class="mt-8 font-bold border-color border-2 p-2 border-dashed w-fit hover:bg-red-500">Press</p>
           </div>
         </div>
       </a>
@@ -94,19 +79,19 @@
           >
             <img src="assets/ikone/bomb.svg" class="filter-white" />
 
-            <h2 class="mt-4 text-xl font-medium sm:text-2xl">Mines</h2>
+            <h2 class="mt-4 text-xl sm:text-2xl">Mines</h2>
           </div>
 
           <div
             class="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
           >
-            <h3 class="mt-4 text-xl font-medium sm:text-2xl">Mines</h3>
+            <h3 class="mt-4 text-xl sm:text-2xl">Mines</h3>
 
             <p class="mt-4 text-sm sm:text-base">
               Mines are everywhere. You have to find them and avoid them.
             </p>
 
-            <p class="mt-8 font-bold">Press</p>
+            <p class="mt-8 font-bold border-color border-2 p-2 border-dashed w-fit hover:bg-red-500">Press</p>
           </div>
         </div>
       </a>
@@ -128,20 +113,20 @@
           >
             <img src="assets/ikone/playing-cards.svg" class="filter-white" />
 
-            <h2 class="mt-4 text-xl font-medium sm:text-2xl">Black Jack</h2>
+            <h2 class="mt-4 text-xl sm:text-2xl">Black Jack</h2>
           </div>
 
           <div
             class="absolute p-4 opacity-0 transition-opacity group-hover:relative group-hover:opacity-100 sm:p-6 lg:p-8"
           >
-            <h3 class="mt-4 text-xl font-medium sm:text-2xl">Black Jack</h3>
+            <h3 class="mt-4 text-xl sm:text-2xl">Black Jack</h3>
 
             <p class="mt-4 text-sm sm:text-base">
               Jack Black is a great actor and a great musician. He is also a
               great game.
             </p>
 
-            <p class="mt-8 font-bold">Press</p>
+            <p class="mt-8 font-bold border-color border-2 p-2 border-dashed w-fit hover:bg-red-500">Press</p>
           </div>
         </div>
       </a>
