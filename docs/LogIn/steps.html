@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #18181D;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        window.onload = function() {
+            // Get the access token from wherever you have stored it
+            var access_token = localStorage.getItem('access_token');
+
+            fetch('https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json', {
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Save the step data in local storage
+                localStorage.setItem('steps', data['activities-steps'][0].value);
+
+                // Redirect to index.html
+                window.location.href = 'index.html';
+            })
+            .catch(error => console.error('Error:', error));
+        };
+    </script>
+</body>
+</html>
