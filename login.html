@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Google Fit Authorization</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <style>
+            body {
+                background-color: #18181D;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                color: white;
+            }
+            button {
+                background-color: #18181D;
+                color: white;
+                border: 2px solid white;
+                padding: 20px;
+                font-size: 20px;
+                margin: 10px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div>
+            <div class="g_id_signin" data-type="standard"></div>
+            <button id="getStepsButton">Get Steps</button>
+        </div>
+
+        <script>
+            function handleCredentialResponse(response) {
+                // Get the access token from the response
+                var access_token = response.credential;
+
+                // Store the access token in the session
+                sessionStorage.setItem('access_token', access_token);
+            }
+
+            window.onload = function() {
+                google.accounts.id.initialize({
+                    client_id: 'YOUR_CLIENT_ID',
+                    callback: handleCredentialResponse
+                });
+                google.accounts.id.renderButton(
+                    document.getElementsByClassName('g_id_signin')[0],
+                    { theme: 'outline', size: 'large' }  // customize the button
+                );
+            };
+
+            $(document).ready(function() {
+                $('#getStepsButton').click(function() {
+                    // Get the access token from the session
+                    var access_token = sessionStorage.getItem('access_token');
+
+                    // Make a request to the Google Fit API to get the user's step count
+                    // Note: You need to replace 'startTimeMillis' and 'endTimeMillis' with actual values
+                    $.ajax({
+                        url: 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + access_token
+                        },
+                        data: JSON.stringify({
+                            "aggregateBy": [{
+                                "dataTypeName": "com.google.step_count.delta",
+                                "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+                            }],
+                            "bucketByTime": { "durationMillis": 86400000 },
+                            "startTimeMillis": 1617235200000,
+                            "endTimeMillis": 1617321600000
+                        }),
+                        contentType: 'application/json',
+                        success: function(response) {
+                            var stepCount = response.bucket[0].dataset[0].point[0].value[0].intVal;
+
+                            // Send the step count to the specified URL
+                            var url = 'https://mihael-tin-banda.github.io/index.html?' +
+                                    'stepCount=' + encodeURIComponent(stepCount);
+
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
