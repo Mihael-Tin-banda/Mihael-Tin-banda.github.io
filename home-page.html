@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Steps</title>
-    <link rel="stylesheet" href="../../css/output.css" />
-    <link rel="stylesheet" href="../../css/main.css" />
+    <link rel="stylesheet" href="css/output.css" />
+    <link rel="stylesheet" href="css/main.css" />
   </head>
 
   <body class="w-full h-screen flex flex-col justify-between overflow-auto bg-color cutive-mono-regular">
@@ -16,6 +16,7 @@
       <h1 class="text-5xl absolute left-1/2 transform -translate-x-1/2">"STEPS"</h1>
 
       <div class="flex">
+        <button id="Authenticate" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Authenticate</button>
         <button id="Get_KK" class="border-color border-2 p-2 border-dashed hover:bg-red-500 mr-2">Get KorakKoins</button>
       </div>
     </div>
@@ -39,7 +40,7 @@
           <div
             class="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8"
           >
-            <img src="ikone/pachinko.svg" class="filter-white" />
+            <img src="assets/ikone/pachinko.svg" class="filter-white" />
 
             <h2 class="mt-4 text-xl sm:text-2xl">Pachinko</h2>
           </div>
@@ -71,7 +72,7 @@
           <div
             class="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8"
           >
-            <img src="ikone/bomb.svg" class="filter-white" />
+            <img src="assets/ikone/bomb.svg" class="filter-white" />
 
             <h2 class="mt-4 text-xl sm:text-2xl">Mines</h2>
           </div>
@@ -105,7 +106,7 @@
           <div
             class="p-4 !pt-0 transition-opacity group-hover:absolute group-hover:opacity-0 sm:p-6 lg:p-8"
           >
-            <img src="ikone/playing-cards.svg" class="filter-white" />
+            <img src="assets/ikone/playing-cards.svg" class="filter-white" />
 
             <h2 class="mt-4 text-xl sm:text-2xl">Black Jack</h2>
           </div>
@@ -125,85 +126,89 @@
         </div>
       </a>
     </div>
-    <script src="../../js/main.js"></script>
+    <script src="js/main.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-      // Fetch the step count data
-      var access_token = sessionStorage.getItem('access_token');
+        var clientId = "786268764964-07k8euka1hg47u2amgl6fe5u4fko9j81.apps.googleusercontent.com";
+        var redirectUri = "https://mihael-tin-banda.github.io/docs/home-page/home-page.html";
+        var scope = "https://www.googleapis.com/auth/fitness.activity.read";
+        var authUrl = "https://accounts.google.com/o/oauth2/auth?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&scope=" + scope + "&response_type=token";
 
-      // Get the button element
-      var getKKButton = document.getElementById('Get_KK');
-
-      // Attach an event listener to the button
-      getKKButton.addEventListener('click', handleRequest);
-
-      // Function to handle the request
-      function handleRequest() {
-        // Create a new XMLHttpRequest
-        var xhr = new XMLHttpRequest();
-
-        // Setup our listener to process completed requests
-        xhr.onload = function () {
-          if (this.status === 200) {
-            var response = JSON.parse(this.responseText);
-            // Handle the response
-            // ...
-          } else if (this.status === 401) {
-            // The access token is expired or invalid, refresh it
-            refreshToken();
-          } else {
-            console.log('Failed to fetch the step count data', this.status, this.responseText);
-          }
-        };
-
-        // Handle network errors
-        xhr.onerror = function () {
-          console.log('Network error');
-        };
-
-        // Configure the request
-        xhr.open('POST', 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate');
-        xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-
-        // Prepare the data
-        var data = JSON.stringify({
-          "aggregateBy": [{
-            "dataTypeName": "com.google.step_count.delta",
-            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-          }],
-          "bucketByTime": { "durationMillis": 86400000 },
-          "startTimeMillis": (Date.now() - 86400000) * 1000,
-          "endTimeMillis": Date.now() * 1000
+        var authenticateButton = document.getElementById('Authenticate');
+        authenticateButton.addEventListener('click', function() {
+            window.location.href = authUrl;
         });
 
-        // Send the request
-        xhr.send(data);
-      }
+        var getKKButton = document.getElementById('Get_KK');
+        getKKButton.addEventListener('click', handleRequest);
 
-      function refreshToken() {
-        var refresh_token = sessionStorage.getItem('refresh_token');
+        function handleRequest() {
+            var access_token = sessionStorage.getItem('access_token');
+            if (!access_token) {
+                console.log('You need to authenticate first');
+                return;
+            }
 
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function () {
-          if (this.status === 200) {
-            var response = JSON.parse(this.responseText);
-            sessionStorage.setItem('access_token', response.access_token);
-          } else {
-            console.log('Failed to refresh token', this.status, this.responseText);
-          }
-        };
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    var response = JSON.parse(this.responseText);
+                    // Handle the response
+                    // ...
+                } else if (this.status === 401) {
+                    refreshToken();
+                } else {
+                    console.log('Failed to fetch the step count data', this.status, this.responseText);
+                }
+            };
 
-        xhr.open('POST', 'https://oauth2.googleapis.com/token');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onerror = function () {
+                console.log('Network error');
+            };
 
-        var data = 'refresh_token=' + refresh_token +
-                   '&client_id=' + "786268764964-07k8euka1hg47u2amgl6fe5u4fko9j81.apps.googleusercontent.com" +
-                   '&client_secret=' + "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" +
-                   '&grant_type=refresh_token';
+            xhr.open('POST', 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate');
+            xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
+            xhr.setRequestHeader('Content-Type', 'application/json');
 
-        xhr.send(data);
-      }
+            var data = JSON.stringify({
+                "aggregateBy": [{
+                    "dataTypeName": "com.google.step_count.delta",
+                    "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+                }],
+                "bucketByTime": { "durationMillis": 86400000 },
+                "startTimeMillis": (Date.now() - 86400000) * 1000,
+                "endTimeMillis": Date.now() * 1000
+            });
+
+            xhr.send(data);
+        }
+
+        function refreshToken() {
+            var refresh_token = sessionStorage.getItem('refresh_token');
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    var response = JSON.parse(this.responseText);
+                    sessionStorage.setItem('access_token', response.access_token);
+                } else {
+                    console.log('Failed to refresh token', this.status, this.responseText);
+                    var error = JSON.parse(this.responseText);
+                    if (error.error && error.error.message) {
+                        console.log('Error message: ', error.error.message);
+                    }
+                }
+            };
+
+            xhr.open('POST', 'https://oauth2.googleapis.com/token');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+            var data = 'refresh_token=' + refresh_token +
+                                 '&client_id=' + clientId +
+                                 '&client_secret=' + "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" +
+                                 '&grant_type=refresh_token';
+
+            xhr.send(data);
+        }
     </script>
   </body>
 </html>
