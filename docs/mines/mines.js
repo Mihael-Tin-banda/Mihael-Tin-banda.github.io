@@ -1,3 +1,5 @@
+import { updateUserCoins } from '../../js/data.js';
+
 let multiply = 1.0;
 let scoreIncrement = 0.2;
 let coins = 100.0; // User's total coins

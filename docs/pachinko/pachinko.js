@@ -1,3 +1,5 @@
+import { updateUserCoins } from '../../js/data.js';
+
 document.getElementById('increaseCost').addEventListener('click', function() {
     var ballCost = document.getElementById('ballCost');
     ballCost.value = parseFloat(ballCost.value) + 1.0;
@@ -251,7 +253,7 @@ Matter.World.add(engine.world, sections);
 
 // create an array to store all the balls
 
-balls = [];
+var balls = [];
 
 
 
@@ -265,9 +267,8 @@ window.launchBall = function () {
     for (let i = 0; i < ballsToLaunch; i++) {
       if (coins > ballCost) { // check if the coins is greater than the cost of a ball
         coins -= ballCost; // subtract the cost of a ball from the coins
-        document.getElementById("coins").textContent =
-          "Coins: " + coins.toFixed(1);
-  
+        updateUserCoins(coins); // update the display of the coins
+
         let variation = 100; // replace with the amount of variation you want
         let randomX = launcher.position.x - variation / 2 + Math.random() * variation;
 
@@ -328,7 +329,7 @@ Events.on(engine, "collisionStart", function (event) {
           if (section.coins !== undefined) {
             coins += section.coins * ballCost;
             console.log("Added coins: " + section.coins); // display the added coins in the console
-            document.getElementById("coins").textContent = "coins: " + coins.toFixed(1);
+            updateUserCoins(coins); // update the display of the coins
         } else {
             console.log("Error: section.coins is undefined");
         }
@@ -338,8 +339,27 @@ Events.on(engine, "collisionStart", function (event) {
   });
 
 // create a variable to keep track of the coins
+var storedCoins = localStorage.getItem('coins');
+var coins = (!isNaN(parseFloat(storedCoins)) && storedCoins !== null) ? parseFloat(storedCoins) : 0;
 
-let coins = 100.0
+// Give the user 10 coins for starting the game
+if (localStorage.getItem('coins') === null) {
+  // This is the first time the game is being started
+  coins = 10;
+  localStorage.setItem('coins', coins);
+} else {
+  // This is not the first time the game is being started
+  // Retrieve the coin count from local storage
+  coins = parseFloat(localStorage.getItem('coins'));
+}
+
+// When the user wins or loses coins...
+let coinChange = coins;
+
+coins = coinChange;
+localStorage.setItem('coins', coins);
+
+updateUserCoins(coinChange);
 
 // handle collisions
 Events.on(engine, "collisionStart", function (event) {
@@ -354,8 +374,6 @@ Events.on(engine, "collisionStart", function (event) {
       if (pair.bodyB.label.startsWith("section")) {
         if (typeof pair.bodyB.coins === 'number') {
           coins += pair.bodyB.coins; // use the coins assigned to the section
-          document.getElementById("coins").textContent =
-            "Coins: " + coins.toFixed(1); // update the coins display
         Matter.World.remove(engine.world, ball); // remove the ball from the world
         ball = null; // set the ball to null
       } else {
@@ -367,8 +385,6 @@ Events.on(engine, "collisionStart", function (event) {
       // update the coins based on the section the ball collided with
       if (pair.bodyA.label.startsWith("section")) {
         coins += pair.bodyA.coins; // use the coins assigned to the section
-        document.getElementById("coins").textContent =
-          "Coins: " + coins.toFixed(1); // update the coins display
         Matter.World.remove(engine.world, ball); // remove the ball from the world
         ball = null; // set the ball to null
       }
@@ -406,6 +422,7 @@ Events.on(engine, "afterUpdate", function () {
     console.log("The ball has reached the bottom of the screen");
   }
 });
+
 
 // run the renderer
 Render.run(render);
