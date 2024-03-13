@@ -147,13 +147,38 @@
       var scope = "https://www.googleapis.com/auth/fitness.activity.read";
       var authUrl = config.web.auth_uri + "?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&scope=" + scope + "&response_type=token";
     
-        var authenticateButton = document.getElementById('Authenticate');
-        authenticateButton.addEventListener('click', function() {
-            window.location.href = authUrl;
-        });
+      function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, '\\$&');
+      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+          results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+  }
 
-        var getKKButton = document.getElementById('Get_KK');
-        getKKButton.addEventListener('click', handleRequest);
+  window.onload = function() {
+      var accessToken = getParameterByName('access_token');
+      if (accessToken) {
+          // Save the access token somewhere (e.g., in session storage)
+          sessionStorage.setItem('access_token', accessToken);
+      }
+  };
+
+  var authenticateButton = document.getElementById('Authenticate');
+  authenticateButton.addEventListener('click', function() {
+      window.location.href = authUrl;
+  });
+
+  var getKKButton = document.getElementById('Get_KK');
+  getKKButton.addEventListener('click', function() {
+      var accessToken = sessionStorage.getItem('access_token');
+      if (!accessToken) {
+          console.log('You need to authenticate first');
+          return;
+      }
+      handleRequest(accessToken);
+  });
 
         function handleRequest() {
             var access_token = sessionStorage.getItem('access_token');
