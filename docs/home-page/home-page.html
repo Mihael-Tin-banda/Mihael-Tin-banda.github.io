@@ -138,12 +138,7 @@
       // Fetch the step count data
       var access_token = sessionStorage.getItem('access_token');
 
-      // Function to handle the request
-      function handleRequest() {
-        if (!access_token) {
-          console.error('Access token not found in session storage.');
-          return;
-        }
+      
 
         // Create a new XMLHttpRequest
         var xhr = new XMLHttpRequest();
