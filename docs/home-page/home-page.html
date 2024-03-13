@@ -138,54 +138,60 @@
       // Fetch the step count data
       var access_token = sessionStorage.getItem('access_token');
 
-      if (!access_token) {
-        console.error('Access token not found in session storage.');
-        return;
+      // Function to handle the request
+      function handleRequest() {
+        if (!access_token) {
+          console.error('Access token not found in session storage.');
+          return;
+        }
+
+        // Create a new XMLHttpRequest
+        var xhr = new XMLHttpRequest();
+
+        // Setup our listener to process completed requests
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            // The request has been completed successfully
+            try {
+              var response = JSON.parse(xhr.responseText);
+              if (response.bucket && response.bucket[0].dataset && response.bucket[0].dataset[0].point && response.bucket[0].dataset[0].point[0].value && response.bucket[0].dataset[0].point[0].value[0].intVal) {
+                var steps = response.bucket[0].dataset[0].point[0].value[0].intVal;
+                var coins = steps / 100;
+                document.getElementById('coinDisplay').textContent = 'Coins: ' + coins.toFixed(2);
+              } else {
+                console.error('Unexpected response structure from Google Fit API.');
+              }
+            } catch (e) {
+              console.error('Error parsing response from Google Fit API:', e);
+            }
+          } else {
+            // The request has failed
+            console.error('Error:', xhr.status);
+          }
+        };
+
+        // Configure the request
+        xhr.open('POST', 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+
+        // Prepare the data
+        var data = JSON.stringify({
+          "aggregateBy": [{
+            "dataTypeName": "com.google.step_count.delta",
+            "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+          }],
+          "bucketByTime": { "durationMillis": 86400000 },
+          "startTimeMillis": Date.now() - 86400000,
+          "endTimeMillis": Date.now()
+        });
+
+        // Send the request
+        xhr.send(data);
       }
 
-      // Create a new XMLHttpRequest
-      var xhr = new XMLHttpRequest();
-
-      // Setup our listener to process completed requests
-      xhr.onload = function () {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          // The request has been completed successfully
-          try {
-            var response = JSON.parse(xhr.responseText);
-            if (response.bucket && response.bucket[0].dataset && response.bucket[0].dataset[0].point && response.bucket[0].dataset[0].point[0].value && response.bucket[0].dataset[0].point[0].value[0].intVal) {
-              var steps = response.bucket[0].dataset[0].point[0].value[0].intVal;
-              var coins = steps / 100;
-              document.getElementById('coinDisplay').textContent = 'Coins: ' + coins.toFixed(2);
-            } else {
-              console.error('Unexpected response structure from Google Fit API.');
-            }
-          } catch (e) {
-            console.error('Error parsing response from Google Fit API:', e);
-          }
-        } else {
-          // The request has failed
-          console.error('Error:', xhr.status);
-        }
-      };
-
-      // Configure the request
-      xhr.open('POST', 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate');
-      xhr.setRequestHeader('Authorization', 'Bearer ' + access_token);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-
-      // Prepare the data
-      var data = JSON.stringify({
-        "aggregateBy": [{
-          "dataTypeName": "com.google.step_count.delta",
-          "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-        }],
-        "bucketByTime": { "durationMillis": 86400000 },
-        "startTimeMillis": Date.now() - 86400000,
-        "endTimeMillis": Date.now()
-      });
-
-      // Send the request
-      xhr.send(data);
+      // Call the function
+      handleRequest();
     </script>
   </body>
 </html>
