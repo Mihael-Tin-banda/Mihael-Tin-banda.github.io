@@ -1,14 +1,27 @@
 import { updateUserCoins } from '../../js/data.js';
 
+// Whenever you update the coins, also update it in localStorage
+function updateCoins(newCoins) {
+    coins = newCoins;
+    localStorage.setItem('coins', coins);
+    updateUserCoins(coins);
+  }
+
+// Whenever you need to get the value of coins, get it from localStorage
+function getCoins() {
+    var storedCoins = localStorage.getItem('coins');
+    return (!isNaN(parseFloat(storedCoins)) && storedCoins !== null) ? parseFloat(storedCoins) : 0;
+  }
+
 let multiply = 1.0;
 let scoreIncrement = 0.2;
-let coins = 100.0; // User's total coins
+let coins = getCoins(); // User's total coins
 let currentBet = 0.0; // User's current bet
 let gameActive = false; // Whether the game is currently active
+let timerId = null; // Add this line
 
 function updateScore() {
     document.getElementById("multiply").textContent = "Multiply: " + multiply.toFixed(1);
-    document.getElementById("coins").textContent = "Coins: " + coins.toFixed(1); // Display total coins
 }
 
 document.getElementById("placeBetButton").addEventListener("click", function() {
@@ -22,7 +35,7 @@ document.getElementById("placeBetButton").addEventListener("click", function() {
 });
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
-    coins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
+    updateCoins(getCoins() + currentBet * multiply); // Multiply the bet by the multiply and add it to the total coins
     initGame();
 }); 
 
@@ -51,12 +64,12 @@ function stopTimer() {
 }
 
 function placeBet(bet) {
-    if (bet > coins) {
+    if (bet > getCoins()) {
         alert("You don't have enough coins to place this bet.");
         return;
     }
     currentBet = bet;
-    coins -= bet;
+    updateCoins(getCoins() - bet);
     updateScore();
     gameActive = true; // Start the game when the bet is placed
     initGame(); // Reset the game
@@ -102,6 +115,8 @@ function initGame() {
                 stopTimer(); // Stop the timer when the game is over
                 gameActive = false; // Lock the game when the user loses
                 initGame();
+                this.style.display = 'none'; // Hide the withdrawButton
+                document.getElementById("placeBetButton").style.display = 'block'; // Show the placeBetButton
             } else {
                 multiply += scoreIncrement;
                 scoreIncrement += 0.2;
@@ -116,10 +131,9 @@ function initGame() {
 
 document.getElementById("withdrawButton").addEventListener("click", function() {
     if (multiply === 1.0) {
-        coins -= currentBet; // Return the current bet
-        coins += currentBet; // Return the current bet
+        updateCoins(getCoins()); // Return the current bet
     } else {
-        coins += currentBet * multiply; // Multiply the bet by the multiply and add it to the total coins
+        updateCoins(getCoins() + currentBet * multiply); // Multiply the bet by the multiply and add it to the total coins
     }
     stopTimer(); // Stop the timer when the user withdraws
     gameActive = false; // Lock the game when the user withdraws
