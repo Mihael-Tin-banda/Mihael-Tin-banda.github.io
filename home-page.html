@@ -129,11 +129,23 @@
     <script src="js/main.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        var clientId = "786268764964-07k8euka1hg47u2amgl6fe5u4fko9j81.apps.googleusercontent.com";
-        var redirectUri = "https://mihael-tin-banda.github.io/docs/home-page/home-page.html";
-        var scope = "https://www.googleapis.com/auth/fitness.activity.read";
-        var authUrl = "https://accounts.google.com/o/oauth2/auth?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&scope=" + scope + "&response_type=token";
-
+      var config = {
+          "web": {
+              "client_id": "786268764964-07k8euka1hg47u2amgl6fe5u4fko9j81.apps.googleusercontent.com",
+              "project_id": "pristine-ally-417110",
+              "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+              "token_uri": "https://oauth2.googleapis.com/token",
+              "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+              "client_secret": "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",
+              "javascript_origins": ["https://mihael-tin-banda.github.io"]
+          }
+      };
+  
+      var clientId = config.web.client_id;
+      var redirectUri = config.web.javascript_origins[0] + "/docs/home-page/home-page.html";
+      var scope = "https://www.googleapis.com/auth/fitness.activity.read";
+      var authUrl = config.web.auth_uri + "?client_id=" + clientId + "&redirect_uri=" + redirectUri + "&scope=" + scope + "&response_type=token";
+  
         var authenticateButton = document.getElementById('Authenticate');
         authenticateButton.addEventListener('click', function() {
             window.location.href = authUrl;
@@ -184,31 +196,31 @@
         }
 
         function refreshToken() {
-            var refresh_token = sessionStorage.getItem('refresh_token');
-            var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                if (this.status === 200) {
-                    var response = JSON.parse(this.responseText);
-                    sessionStorage.setItem('access_token', response.access_token);
-                } else {
-                    console.log('Failed to refresh token', this.status, this.responseText);
-                    var error = JSON.parse(this.responseText);
-                    if (error.error && error.error.message) {
-                        console.log('Error message: ', error.error.message);
-                    }
+        var refresh_token = sessionStorage.getItem('refresh_token');
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            if (this.status === 200) {
+                var response = JSON.parse(this.responseText);
+                sessionStorage.setItem('access_token', response.access_token);
+            } else {
+                console.log('Failed to refresh token', this.status, this.responseText);
+                var error = JSON.parse(this.responseText);
+                if (error.error && error.error.message) {
+                    console.log('Error message: ', error.error.message);
                 }
-            };
+            }
+        };
 
-            xhr.open('POST', 'https://oauth2.googleapis.com/token');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.open('POST', config.web.token_uri);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
-            var data = 'refresh_token=' + refresh_token +
-                                 '&client_id=' + clientId +
-                                 '&client_secret=' + "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" +
-                                 '&grant_type=refresh_token';
+        var data = 'refresh_token=' + refresh_token +
+                             '&client_id=' + clientId +
+                             '&client_secret=' + config.web.client_secret +
+                             '&grant_type=refresh_token';
 
-            xhr.send(data);
-        }
-    </script>
+        xhr.send(data);
+    }
+</script>
   </body>
 </html>
