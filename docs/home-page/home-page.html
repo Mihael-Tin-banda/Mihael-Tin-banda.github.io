@@ -138,7 +138,9 @@
       // Fetch the step count data
       var access_token = sessionStorage.getItem('access_token');
 
-      
+      // Function to handle the request
+      function handleRequest() {
+        
 
         // Create a new XMLHttpRequest
         var xhr = new XMLHttpRequest();
@@ -183,6 +185,7 @@
 
         // Send the request
         xhr.send(data);
+      }
 
       // Call the function
       handleRequest();
