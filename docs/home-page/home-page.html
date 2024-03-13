@@ -131,9 +131,6 @@
       // Fetch the step count data
       var access_token = sessionStorage.getItem('access_token');
 
-      // Log the access token
-      console.log('Access token:', access_token);
-
       // Get the button element
       var getKKButton = document.getElementById('Get_KK');
 
@@ -147,7 +144,21 @@
 
         // Setup our listener to process completed requests
         xhr.onload = function () {
-          // ... rest of your JavaScript code ...
+          if (this.status === 200) {
+            var response = JSON.parse(this.responseText);
+            // Handle the response
+            // ...
+          } else if (this.status === 401) {
+            // The access token is expired or invalid, refresh it
+            refreshToken();
+          } else {
+            console.log('Failed to fetch the step count data', this.status, this.responseText);
+          }
+        };
+
+        // Handle network errors
+        xhr.onerror = function () {
+          console.log('Network error');
         };
 
         // Configure the request
@@ -162,11 +173,35 @@
             "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
           }],
           "bucketByTime": { "durationMillis": 86400000 },
-          "startTimeMillis": Date.now() - 86400000,
-          "endTimeMillis": Date.now()
+          "startTimeMillis": (Date.now() - 86400000) * 1000,
+          "endTimeMillis": Date.now() * 1000
         });
 
         // Send the request
+        xhr.send(data);
+      }
+
+      function refreshToken() {
+        var refresh_token = sessionStorage.getItem('refresh_token');
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          if (this.status === 200) {
+            var response = JSON.parse(this.responseText);
+            sessionStorage.setItem('access_token', response.access_token);
+          } else {
+            console.log('Failed to refresh token', this.status, this.responseText);
+          }
+        };
+
+        xhr.open('POST', 'https://oauth2.googleapis.com/token');
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        var data = 'refresh_token=' + refresh_token +
+                   '&client_id=' + "786268764964-07k8euka1hg47u2amgl6fe5u4fko9j81.apps.googleusercontent.com" +
+                   '&client_secret=' + "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" +
+                   '&grant_type=refresh_token';
+
         xhr.send(data);
       }
     </script>
