@@ -16,21 +16,12 @@
                 margin: 0;
                 color: white;
             }
-            button {
-                background-color: #18181D;
-                color: white;
-                border: 2px solid white;
-                padding: 20px;
-                font-size: 20px;
-                margin: 10px;
-            }
         </style>
     </head>
 
     <body>
         <div>
             <div class="g_id_signin" data-type="standard"></div>
-            <button id="getStepsButton">Get Steps</button>
         </div>
 
         <script>
@@ -50,6 +41,7 @@
             function handleCredentialResponse(response) {
                 var access_token = response.credential;
                 sessionStorage.setItem('access_token', access_token);
+                window.location.href = googleCredentials.web.redirect_uris[0];
             }
 
             window.onload = function() {
@@ -62,37 +54,6 @@
                     { theme: 'outline', size: 'large' }
                 );
             };
-
-            $(document).ready(function() {
-                $('#getStepsButton').click(function() {
-                    var access_token = sessionStorage.getItem('access_token');
-
-                    $.ajax({
-                        url: 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + access_token
-                        },
-                        data: JSON.stringify({
-                            "aggregateBy": [{
-                                "dataTypeName": "com.google.step_count.delta",
-                                "dataSourceId": "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-                            }],
-                            "bucketByTime": { "durationMillis": 86400000 },
-                            "startTimeMillis": 1617235200000,
-                            "endTimeMillis": 1617321600000
-                        }),
-                        contentType: 'application/json',
-                        success: function(response) {
-                            var stepCount = response.bucket[0].dataset[0].point[0].value[0].intVal;
-                            var url = 'https://mihael-tin-banda.github.io/index.html?' +
-                                    'stepCount=' + encodeURIComponent(stepCount);
-
-                            window.location.href = url;
-                        }
-                    });
-                });
-            });
         </script>
     </body>
 </html>
