@@ -34,32 +34,39 @@
         </div>
 
         <script>
-            function handleCredentialResponse(response) {
-                // Get the access token from the response
-                var access_token = response.credential;
+            var googleCredentials = {
+                "web": {
+                    "client_id": "786268764964-07k8euka1hg47u2amgl6fe5u4fko9j81.apps.googleusercontent.com",
+                    "project_id": "pristine-ally-417110",
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+                    "client_secret": "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",
+                    "redirect_uris": ["http://127.0.0.1:5500/docs/home-page/home-page.html"],
+                    "javascript_origins": ["https://mihael-tin-banda.github.io"]
+                }
+            };
 
-                // Store the access token in the session
+            function handleCredentialResponse(response) {
+                var access_token = response.credential;
                 sessionStorage.setItem('access_token', access_token);
             }
 
             window.onload = function() {
                 google.accounts.id.initialize({
-                    client_id: 'YOUR_CLIENT_ID',
+                    client_id: googleCredentials.web.client_id,
                     callback: handleCredentialResponse
                 });
                 google.accounts.id.renderButton(
                     document.getElementsByClassName('g_id_signin')[0],
-                    { theme: 'outline', size: 'large' }  // customize the button
+                    { theme: 'outline', size: 'large' }
                 );
             };
 
             $(document).ready(function() {
                 $('#getStepsButton').click(function() {
-                    // Get the access token from the session
                     var access_token = sessionStorage.getItem('access_token');
 
-                    // Make a request to the Google Fit API to get the user's step count
-                    // Note: You need to replace 'startTimeMillis' and 'endTimeMillis' with actual values
                     $.ajax({
                         url: 'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
                         method: 'POST',
@@ -78,8 +85,6 @@
                         contentType: 'application/json',
                         success: function(response) {
                             var stepCount = response.bucket[0].dataset[0].point[0].value[0].intVal;
-
-                            // Send the step count to the specified URL
                             var url = 'https://mihael-tin-banda.github.io/index.html?' +
                                     'stepCount=' + encodeURIComponent(stepCount);
 
