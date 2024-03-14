@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Numbers</title>
+    <link rel="stylesheet" href="../../css/output.css">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <a href="../../index.html" class="bg-red-500 p-2">Go back</a>
+    <div class="flex flex-col items-center justify-center">
+        <h1 class="text-center text-4xl font-bold text-white">Lucky Numbers</h1>
+        <p id="coinDisplay" class="text-white"></p>
+
+        <div class="flex flex-col items-center">
+            <input type="number" id="betInput" min="0" value="0" class="text-center">
+
+            <div class="flex gap-2 mt-2">
+                <button id="placeBetButton" class="rounded-sm bg-red-500 p-2 hover:bg-red-800 text-white">Place Bet</button>
+                <button id="withdrawButton" class="rounded-sm bg-red-500 p-2 hover:bg-red-800 text-white" style="display: none;">Withdraw</button>
+            </div>
+        </div>
+
+        <p id="correctGuesses" class="text-center text-white"></p>
+        <p id="timer" class="text-white"></p>
+    </div>
+
+    <div class="flex justify-center items-center mt-10">
+        <div id="grid" class="flex flex-wrap" style="width: 26rem;">
+        </div>
+    </div>
+    <p id="result" class="text-center text-white"></p>
+    <p id="randomNumbers" class="text-center text-white"></p>
+
+    <script type="module" src="lucky_numbers.js"></script>
+    <script type="module" src="../../js/data.js"></script>
+</body>
+</html>
