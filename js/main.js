@@ -50,54 +50,62 @@ var getKKButton = document.getElementById("Get_KK");
 getKKButton.addEventListener("click", handleRequest);
 
 function handleRequest() {
-  var access_token = sessionStorage.getItem("access_token");
-  console.log('Access token from session storage:', access_token);
-  if (!access_token) {
-    console.log("You need to authenticate first");
-    return;
-  }
-
-  var xhr = new XMLHttpRequest();
-  xhr.onload = function () {
-    if (this.status === 200) {
-      var response = JSON.parse(this.responseText);
-      // Handle the response
-      // ...
-    } else if (this.status === 401) {
-      refreshToken();
-    } else {
-      console.log(
-        "Failed to fetch the step count data",
-        this.status,
-        this.responseText
-      );
+    var access_token = sessionStorage.getItem("access_token");
+    console.log('Access token from session storage:', access_token);
+    if (!access_token) {
+        console.log("You need to authenticate first");
+        return;
     }
-  };
 
-  xhr.onerror = function () {
-    console.log("Network error");
-  };
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        if (this.status === 200) {
+            var response = JSON.parse(this.responseText);
+            var steps = 0;
+            if (response.bucket && response.bucket.length > 0) {
+                var dataset = response.bucket[0].dataset[0];
+                if (dataset.point && dataset.point.length > 0) {
+                    steps = dataset.point[0].value[0].intVal;
+                }
+            }
+            console.log('Current step count:', steps);
+        } else if (this.status === 401) {
+            refreshToken();
+        } else {
+            console.log(
+                "Failed to fetch the step count data",
+                this.status,
+                this.responseText
+            );
+        }
+    };
 
-  xhr.open(
-    "POST",
-    "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate"
-  );
-  xhr.setRequestHeader("Authorization", "Bearer " + access_token);
-  xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onerror = function () {
+        console.log("Network error");
+    };
 
-var data = JSON.stringify({
-  aggregateBy: [
-    {
-      dataTypeName: "com.google.step_count.delta",
-      dataSourceId:
-        "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
-    },
-  ],
-  bucketByTime: { durationMillis: 86400000 },
-  startTimeMillis: Math.floor((Date.now() - 86400000) / 1000),
-  endTimeMillis: Math.floor(Date.now() / 1000),
-});
-  xhr.send(data);
+    xhr.open(
+        "POST",
+        "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate"
+    );
+    xhr.setRequestHeader("Authorization", "Bearer " + access_token);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    var now = new Date();
+    var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var timestamp = startOfDay / 1;
+
+    var data = JSON.stringify({
+        aggregateBy: [{
+            dataTypeName: "com.google.step_count.delta",
+            dataSourceId: "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+        }],
+        bucketByTime: { durationMillis: now - timestamp },
+        startTimeMillis: timestamp,
+        endTimeMillis: now.getTime(),
+    });
+
+    xhr.send(data);
 }
 
 function refreshToken() {
