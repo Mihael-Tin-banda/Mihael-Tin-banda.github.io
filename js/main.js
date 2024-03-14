@@ -10,6 +10,7 @@ function getParameterByName(name, url) {
 
 window.onload = function() {
   var accessToken = getParameterByName('access_token');
+  console.log('Access token from URL:', accessToken);
   if (accessToken) {
       sessionStorage.setItem('access_token', accessToken);
   }
@@ -52,6 +53,7 @@ getKKButton.addEventListener("click", handleRequest);
 
 function handleRequest() {
   var access_token = sessionStorage.getItem("access_token");
+  console.log('Access token from session storage:', access_token);
   if (!access_token) {
     console.log("You need to authenticate first");
     return;
