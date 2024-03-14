@@ -85,19 +85,18 @@ function handleRequest() {
   xhr.setRequestHeader("Authorization", "Bearer " + access_token);
   xhr.setRequestHeader("Content-Type", "application/json");
 
-  var data = JSON.stringify({
-    aggregateBy: [
-      {
-        dataTypeName: "com.google.step_count.delta",
-        dataSourceId:
-          "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
-      },
-    ],
-    bucketByTime: { durationMillis: 86400000 },
-    startTimeMillis: (Date.now() - 86400000) * 1000,
-    endTimeMillis: Date.now() * 1000,
-  });
-
+var data = JSON.stringify({
+  aggregateBy: [
+    {
+      dataTypeName: "com.google.step_count.delta",
+      dataSourceId:
+        "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps",
+    },
+  ],
+  bucketByTime: { durationMillis: 86400000 },
+  startTimeMillis: Date.now() - 86400000,
+  endTimeMillis: Date.now(),
+});
   xhr.send(data);
 }
 
