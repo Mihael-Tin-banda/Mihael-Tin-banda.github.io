@@ -56,10 +56,6 @@ getKKButton.addEventListener("click", handleRequest);
 var steps_sub = 0; // Initialize steps_sub
 var Balance = 0; // Initialize Balance
 
-coins = Balance;
-localStorage.setItem('coins', coins);
-updateUserCoins(coins);
-
 function handleRequest() {
   var access_token = sessionStorage.getItem("access_token");
   console.log('Access token from session storage:', access_token);
@@ -89,6 +85,8 @@ function handleRequest() {
 
       // Save pom_var to steps_sub for next time
       steps_sub = pom_var;
+
+      localStorage.setItem('coins', Balance);
 
       console.log('Balance:', Balance);
     } else if (this.status === 401) {
