@@ -7,17 +7,19 @@ function updateCoinDisplay() {
 }
 
 // Function to update the coin count
+// Function to update the coin count
 export function updateUserCoins(change) {
-    console.log("updateUserCoins called with: ", change); // Add this line
-
-    // coins = 10;
-    // localStorage.setItem('coins', coins);
+    console.log("updateUserCoins called with: ", change);
 
     if (typeof change === 'number') {
         console.log("Change value: ", change);
+        let oldCoins = coins;
         coins = change;
         localStorage.setItem('coins', coins.toFixed(1)); // Save the updated coin count to localStorage
         updateCoinDisplay(); // Update the coin display
+        if (coins !== oldCoins) {
+            location.reload(); // Refresh the page after updating the coin count
+        }
     }
     return coins;
 }
