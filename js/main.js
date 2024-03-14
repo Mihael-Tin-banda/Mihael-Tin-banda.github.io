@@ -1,4 +1,4 @@
-import { updateUserCoins } from 'data.js';
+const { updateUserCoins } = require('data.js');
 
 function getParameterByName(name) {
   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
