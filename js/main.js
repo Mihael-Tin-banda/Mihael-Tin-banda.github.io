@@ -9,6 +9,9 @@ window.onload = function() {
   if (accessToken) {
       sessionStorage.setItem('access_token', accessToken);
   }
+
+  var getKKButton = document.getElementById("Get_KK");
+  getKKButton.addEventListener("click", handleRequest);
 };
 
 var config = {
