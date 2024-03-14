@@ -1,3 +1,5 @@
+import { updateUserCoins } from 'data.js';
+
 function getParameterByName(name) {
   var match = RegExp('[#&]' + name + '=([^&]*)').exec(window.location.hash);
   return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
@@ -49,8 +51,14 @@ authenticateButton.addEventListener("click", function () {
 var getKKButton = document.getElementById("Get_KK");
 getKKButton.addEventListener("click", handleRequest);
 
+
+
 var steps_sub = 0; // Initialize steps_sub
 var Balance = 0; // Initialize Balance
+
+coins = Balance;
+localStorage.setItem('coins', coins);
+updateUserCoins(coins);
 
 function handleRequest() {
   var access_token = sessionStorage.getItem("access_token");
