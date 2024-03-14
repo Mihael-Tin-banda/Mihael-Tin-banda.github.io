@@ -23,9 +23,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
         button.textContent = i;
         button.className = 'number';
         button.addEventListener('click', function() {
-            if (selectedNumbers.length < 5) {
+            let index = selectedNumbers.indexOf(i);
+            if (index > -1) {
+                // Number is already selected, so unselect it
+                selectedNumbers.splice(index, 1);
+                button.style.backgroundColor = "";
+            } else if (selectedNumbers.length < 5) {
+                // Number is not selected and we have less than 5 numbers, so select it
                 selectedNumbers.push(i);
-                button.disabled = true;
                 button.style.backgroundColor = "#9CA3AF";
             }
         });
