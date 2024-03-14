@@ -1,15 +1,4 @@
-document.getElementById('increaseCost').addEventListener('click', function() {
-    var ballCost = document.getElementById('ballCost');
-    ballCost.value = parseFloat(ballCost.value) + 1.0;
-});
-
-document.getElementById('increaseDecost').addEventListener('click', function() {
-    var ballCost = document.getElementById('ballCost');
-    var currentCost = parseFloat(ballCost.value);
-    if (currentCost > 1) {
-        ballCost.value = currentCost - 1.0;
-    }
-});
+import { updateUserCoins } from '../../js/data.js';
 
 // alias for matter.js namespace
 const { Engine, Render, Runner, Bodies, Body, Events } = Matter;
@@ -30,38 +19,28 @@ const render = Render.create({
   element: gameContent, // set the element to the game content element
   engine: engine,
   options: {
-    width: Math.min(window.innerWidth, 1024), // set the width
-    height: Math.min(window.innerHeight, 768), // set the height
+    width: Math.min(window.innerWidth, 800), // set the width
+    height: Math.min(window.innerHeight, 600), // set the height
     wireframes: false,
   },
 });
 
-document.body.addEventListener("keydown", function (event) {
-    if (event.code === "Space") {
-        event.preventDefault(); // prevent the default behavior
-        launchBall();
-    }
+// Launch the ball control
+
+let launchInterval;
+
+document.getElementById('launchBall').addEventListener('click', function() {
+  launchBall();  // start launching balls when the button is clicked
 });
 
-document.body.addEventListener("touchstart", function (event) {
-    event.preventDefault(); // prevent the default behavior
-    launchBall();
+document.getElementById('launchBall').addEventListener('mousedown', function() {
+  // start launching balls when the button is held down
+  launchInterval = setInterval(launchBall, 115); // adjust the interval as needed
 });
 
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function (event) {
-  let now = (new Date()).getTime();
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault();
-  }
-  lastTouchEnd = now;
-}, false);
-
-// adjust the size of the render when the window is resized
-window.addEventListener("resize", function () {
-  render.canvas.width = Math.min(window.innerWidth, 800);
-  render.canvas.height = Math.min(window.innerHeight, 600);
-  Render.run(render);
+document.getElementById('launchBall').addEventListener('mouseup', function() {
+  // stop launching balls when the button is released
+  clearInterval(launchInterval);
 });
 
 // create a runner to run the engine
@@ -110,17 +89,17 @@ const pinOffset = (render.canvas.width - totalPinWidth) / 2;
 
 // create vertices for the pyramid
 const vertices = [
-    { x: (render.canvas.width / 2) - 25, y: 100 }, // left point
-    { x: render.canvas.width / 2, y: 90 }, // top point
-    { x: (render.canvas.width / 2) + 25, y: 100 } // right point
-  ];
+  { x: (render.canvas.width / 2) - 25, y: 95 }, // left point
+  { x: render.canvas.width / 2, y: 85 }, // top point
+  { x: (render.canvas.width / 2) + 25, y: 95 } // right point
+];
   
   // create the launcher
   const launcher = Bodies.fromVertices(render.canvas.width / 2, 50, vertices, {
     // center the launcher
     isStatic: true,
     render: {
-      fillStyle: "#00000000",
+      fillStyle: "transparent",
     },
   });
 Matter.World.add(engine.world, launcher);
@@ -136,37 +115,40 @@ window.onload = function () {
 
 // create the pins
 let pins = [];
-const pinRadius = 15; // smaller radius for a game like Pachinko
-const spacing = 100; // spacing between pins
-const rows = 8; // number of rows in the grid
+const pinRadius = 13; // smaller radius for a game like Pachinko
+const spacing = 90; // spacing between pins
+const rows = 6; // number of rows in the grid
 
 // calculate the start coordinates
-const startY = launcher.position.y + launcher.bounds.max.y + spacing * 0.6; // start the pins below the launcher
+const startY = launcher.position.y + launcher.bounds.max.y + spacing * 0.2; // start the pins below the launcher
 
 // calculate the width of the pyramid
 const pyramidWidth = (rows * 2 - 1) * spacing;
 
-// calculate the start x-coordinate
-const startX = launcher.position.x + launcher.bounds.max.x / 1.08 - pyramidWidth / 2;
-
 for (let i = 0; i < rows; i++) {
-    // number of pins in the current row
-    const cols = rows - i;
+  // number of pins in the current row
+  const cols = rows - i;
 
-    for (let j = 0; j < cols * 1 - 2; j++) {
-        // adjust x position to center the pyramid
-        const x = startX + j * spacing + i * spacing / 2;
-        const y = startY + i * spacing;
-        const pin = Bodies.circle(x, y, pinRadius, {
-            isStatic: true,
-            restitution: 1.2, // higher value to make the pins more bouncy
-            render: {
-                fillStyle: "#fff",
-            },
-        });
-        pins.push(pin);
-        Matter.World.add(engine.world, pin);
-    }
+  // calculate the width of the current row
+  const rowWidth = cols * spacing;
+
+  // calculate the start x-coordinate for the current row
+  const startX = (render.canvas.width - rowWidth) / 2 + spacing / 2; // center the row
+
+  for (let j = 0; j < cols; j++) {
+      // adjust x position to center the pyramid
+      const x = startX + j * spacing;
+      const y = startY + i * spacing;
+      const pin = Bodies.circle(x, y, pinRadius, {
+          isStatic: true,
+          restitution: 1.2, // higher value to make the pins more bouncy
+          render: {
+              fillStyle: "#fff",
+          },
+      });
+      pins.push(pin);
+      Matter.World.add(engine.world, pin);
+  }
 }
 
 // Remove the last pin from the pins array
@@ -251,7 +233,7 @@ Matter.World.add(engine.world, sections);
 
 // create an array to store all the balls
 
-balls = [];
+var balls = [];
 
 
 
@@ -265,16 +247,15 @@ window.launchBall = function () {
     for (let i = 0; i < ballsToLaunch; i++) {
       if (coins > ballCost) { // check if the coins is greater than the cost of a ball
         coins -= ballCost; // subtract the cost of a ball from the coins
-        document.getElementById("coins").textContent =
-          "Coins: " + coins.toFixed(1);
-  
+        updateUserCoins(coins); // update the display of the coins
+
         let variation = 100; // replace with the amount of variation you want
         let randomX = launcher.position.x - variation / 2 + Math.random() * variation;
 
         let newBall = Bodies.circle(
           randomX,
           launcher.position.y,
-          12,
+          10, // Change this value to adjust the size of the ball
           {
             restitution: 0.9,
             render: {
@@ -328,7 +309,7 @@ Events.on(engine, "collisionStart", function (event) {
           if (section.coins !== undefined) {
             coins += section.coins * ballCost;
             console.log("Added coins: " + section.coins); // display the added coins in the console
-            document.getElementById("coins").textContent = "coins: " + coins.toFixed(1);
+            updateUserCoins(coins); // update the display of the coins
         } else {
             console.log("Error: section.coins is undefined");
         }
@@ -338,8 +319,27 @@ Events.on(engine, "collisionStart", function (event) {
   });
 
 // create a variable to keep track of the coins
+var storedCoins = localStorage.getItem('coins');
+var coins = (!isNaN(parseFloat(storedCoins)) && storedCoins !== null) ? parseFloat(storedCoins) : 0;
 
-let coins = 100.0
+// Give the user 10 coins for starting the game
+if (localStorage.getItem('coins') === null) {
+  // This is the first time the game is being started
+  coins = 10;
+  localStorage.setItem('coins', coins);
+} else {
+  // This is not the first time the game is being started
+  // Retrieve the coin count from local storage
+  coins = parseFloat(localStorage.getItem('coins'));
+}
+
+// When the user wins or loses coins...
+let coinChange = coins;
+
+coins = coinChange;
+localStorage.setItem('coins', coins);
+
+updateUserCoins(coinChange);
 
 // handle collisions
 Events.on(engine, "collisionStart", function (event) {
@@ -354,8 +354,6 @@ Events.on(engine, "collisionStart", function (event) {
       if (pair.bodyB.label.startsWith("section")) {
         if (typeof pair.bodyB.coins === 'number') {
           coins += pair.bodyB.coins; // use the coins assigned to the section
-          document.getElementById("coins").textContent =
-            "Coins: " + coins.toFixed(1); // update the coins display
         Matter.World.remove(engine.world, ball); // remove the ball from the world
         ball = null; // set the ball to null
       } else {
@@ -367,8 +365,6 @@ Events.on(engine, "collisionStart", function (event) {
       // update the coins based on the section the ball collided with
       if (pair.bodyA.label.startsWith("section")) {
         coins += pair.bodyA.coins; // use the coins assigned to the section
-        document.getElementById("coins").textContent =
-          "Coins: " + coins.toFixed(1); // update the coins display
         Matter.World.remove(engine.world, ball); // remove the ball from the world
         ball = null; // set the ball to null
       }
@@ -406,6 +402,7 @@ Events.on(engine, "afterUpdate", function () {
     console.log("The ball has reached the bottom of the screen");
   }
 });
+
 
 // run the renderer
 Render.run(render);
