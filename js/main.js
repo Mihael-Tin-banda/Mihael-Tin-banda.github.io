@@ -94,8 +94,8 @@ var data = JSON.stringify({
     },
   ],
   bucketByTime: { durationMillis: 86400000 },
-  startTimeMillis: Date.now() - 86400000,
-  endTimeMillis: Date.now(),
+  startTimeMillis: Math.floor((Date.now() - 86400000) / 1000),
+  endTimeMillis: Math.floor(Date.now() / 1000),
 });
   xhr.send(data);
 }
