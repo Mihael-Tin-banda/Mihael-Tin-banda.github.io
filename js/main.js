@@ -49,64 +49,86 @@ authenticateButton.addEventListener("click", function () {
 var getKKButton = document.getElementById("Get_KK");
 getKKButton.addEventListener("click", handleRequest);
 
+var steps_sub = 0; // Initialize steps_sub
+var Balance = 0; // Initialize Balance
+
 function handleRequest() {
-    var access_token = sessionStorage.getItem("access_token");
-    console.log('Access token from session storage:', access_token);
-    if (!access_token) {
-        console.log("You need to authenticate first");
-        return;
-    }
+  var access_token = sessionStorage.getItem("access_token");
+  console.log('Access token from session storage:', access_token);
+  if (!access_token) {
+    console.log("You need to authenticate first");
+    return;
+  }
 
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        if (this.status === 200) {
-            var response = JSON.parse(this.responseText);
-            var steps = 0;
-            if (response.bucket && response.bucket.length > 0) {
-                var dataset = response.bucket[0].dataset[0];
-                if (dataset.point && dataset.point.length > 0) {
-                    steps = dataset.point[0].value[0].intVal;
-                }
-            }
-            console.log('Current step count:', steps);
-        } else if (this.status === 401) {
-            refreshToken();
-        } else {
-            console.log(
-                "Failed to fetch the step count data",
-                this.status,
-                this.responseText
-            );
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function () {
+    if (this.status === 200) {
+      var response = JSON.parse(this.responseText);
+      var steps = 0;
+      if (response.bucket && response.bucket.length > 0) {
+        var dataset = response.bucket[0].dataset[0];
+        if (dataset.point && dataset.point.length > 0) {
+          steps = dataset.point[0].value[0].intVal;
         }
-    };
+      }
+      console.log('Current step count:', steps);
 
-    xhr.onerror = function () {
-        console.log("Network error");
-    };
+      // Divide steps by 100 and round to one decimal place
+      var pom_var = Math.round((steps / 100) * 10) / 10;
 
-    xhr.open(
-        "POST",
-        "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate"
-    );
-    xhr.setRequestHeader("Authorization", "Bearer " + access_token);
-    xhr.setRequestHeader("Content-Type", "application/json");
+      // Subtract steps_sub from pom_var and add to Balance
+      Balance += pom_var - steps_sub;
 
-    var now = new Date();
-    var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var timestamp = startOfDay / 1;
+      // Save pom_var to steps_sub for next time
+      steps_sub = pom_var;
 
-    var data = JSON.stringify({
-        aggregateBy: [{
-            dataTypeName: "com.google.step_count.delta",
-            dataSourceId: "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
-        }],
-        bucketByTime: { durationMillis: now - timestamp },
-        startTimeMillis: timestamp,
-        endTimeMillis: now.getTime(),
-    });
+      console.log('Balance:', Balance);
+    } else if (this.status === 401) {
+      refreshToken();
+    } else {
+      console.log(
+        "Failed to fetch the step count data",
+        this.status,
+        this.responseText
+      );
+    }
+  };
 
-    xhr.send(data);
+  xhr.onerror = function () {
+    console.log("Network error");
+  };
+
+  xhr.open(
+    "POST",
+    "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate"
+  );
+  xhr.setRequestHeader("Authorization", "Bearer " + access_token);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  var now = new Date();
+  var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var timestamp = startOfDay / 1;
+
+  var data = JSON.stringify({
+    aggregateBy: [{
+      dataTypeName: "com.google.step_count.delta",
+      dataSourceId: "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps"
+    }],
+    bucketByTime: { durationMillis: now - timestamp },
+    startTimeMillis: timestamp,
+    endTimeMillis: now.getTime(),
+  });
+
+  xhr.send(data);
 }
+
+// Reset steps_sub to 0 every day after midnight
+setInterval(function() {
+  var now = new Date();
+  if (now.getHours() === 0 && now.getMinutes() === 0) {
+    steps_sub = 0;
+  }
+}, 60000); // Check every minute
 
 function refreshToken() {
   var refresh_token = sessionStorage.getItem("refresh_token");
