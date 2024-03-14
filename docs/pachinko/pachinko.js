@@ -177,7 +177,7 @@ const sectionStartY = render.canvas.height - sectionHeight / 2; // start the sec
 for (let i = 0; i < numSections; i++) {
   let coins;
   if (i === Math.floor(numSections / 2)) {
-    coins = 8; // middle section
+    coins = 15; // middle section
   } else if (
     i === Math.floor(numSections / 2) - 1 ||
     i === Math.floor(numSections / 2) + 1
