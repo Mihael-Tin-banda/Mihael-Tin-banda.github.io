@@ -48,6 +48,11 @@ authenticateButton.addEventListener("click", function () {
   window.location.href = authUrl;
 });
 
+var getKKButton = document.getElementById("Get_KK");
+getKKButton.addEventListener("click", handleRequest);
+
+
+
 var steps_sub = 0; // Initialize steps_sub
 var Balance = 0; // Initialize Balance
 
@@ -161,9 +166,3 @@ function refreshToken() {
 
   xhr.send(data);
 }
-
-var getKKButton = document.getElementById("Get_KK");
-getKKButton.addEventListener("click", function() {
-  handleRequest();
-  location.reload();
-});

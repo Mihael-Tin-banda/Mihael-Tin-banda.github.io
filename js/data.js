@@ -4,6 +4,7 @@ var coins = 0;
 // Function to update the coin display
 function updateCoinDisplay() {
     document.getElementById('coinDisplay').textContent = `Balance: ${coins.toFixed(1)} KK`;
+    location.reload();
 }
 
 // Function to update the coin count
