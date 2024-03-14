@@ -1,4 +1,4 @@
-unction getParameterByName(name, url) {
+function getParameterByName(name, url) {
   if (!url) url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
   var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
@@ -11,7 +11,6 @@ unction getParameterByName(name, url) {
 window.onload = function() {
   var accessToken = getParameterByName('access_token');
   if (accessToken) {
-      // Save the access token somewhere (e.g., in session storage)
       sessionStorage.setItem('access_token', accessToken);
   }
 };
