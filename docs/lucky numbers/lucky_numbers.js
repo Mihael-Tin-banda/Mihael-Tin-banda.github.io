@@ -39,6 +39,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     document.getElementById('placeBetButton').addEventListener('click', function(e) {
         e.preventDefault();
+        if (selectedNumbers.length < 5) {
+            alert("Please select all 5 numbers before placing a bet.");
+            return;
+        }
         bet = parseFloat(document.getElementById('betInput').value);
         if (bet > getCoins()) {
             alert("You don't have enough coins to place this bet.");
