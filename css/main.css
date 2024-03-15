@@ -41,3 +41,8 @@ h4{
 .border-color {
     border-color: #f7fff7;
 }
+
+.svg-size {
+    width: 100px; /* Adjust this value to match the size of your other SVGs */
+    height: auto;
+  }

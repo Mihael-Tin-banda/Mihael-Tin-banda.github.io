@@ -123,6 +123,7 @@ function initGame() {
                 updateScore();
                 // Change the color of the square
                 square.style.backgroundColor = "#18181d";
+                // Do not reinitialize the game here
             }
         });
         minefield.appendChild(square);
