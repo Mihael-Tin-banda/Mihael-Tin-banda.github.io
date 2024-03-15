@@ -92,7 +92,7 @@ function handleRequest() {
 
       setTimeout(function() {
         location.reload();
-      }, 2000);
+      }, 1000);
     } else if (this.status === 401) {
       refreshToken();
     } else {
