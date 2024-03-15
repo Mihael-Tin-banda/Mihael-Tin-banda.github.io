@@ -89,6 +89,10 @@ function handleRequest() {
       localStorage.setItem('coins', Balance);
 
       console.log('Balance:', Balance);
+
+      setTimeout(function() {
+        location.reload();
+      }, 2000);
     } else if (this.status === 401) {
       refreshToken();
     } else {
@@ -99,6 +103,9 @@ function handleRequest() {
       );
     }
   };
+
+  // ... rest of the code ...
+}
 
   xhr.onerror = function () {
     console.log("Network error");
@@ -126,7 +133,6 @@ function handleRequest() {
   });
 
   xhr.send(data);
-}
 
 // Reset steps_sub to 0 every day after midnight
 setInterval(function() {
