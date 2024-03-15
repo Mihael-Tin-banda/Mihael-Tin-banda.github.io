@@ -104,9 +104,6 @@ function handleRequest() {
     }
   };
 
-  // ... rest of the code ...
-}
-
   xhr.onerror = function () {
     console.log("Network error");
   };
@@ -133,6 +130,7 @@ function handleRequest() {
   });
 
   xhr.send(data);
+}
 
 // Reset steps_sub to 0 every day after midnight
 setInterval(function() {
