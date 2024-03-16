@@ -27,6 +27,10 @@ function updateScore() {
 document.getElementById("placeBetButton").addEventListener("click", function() {
     let bet = parseFloat(document.getElementById("betInput").value);
     
+    if (bet < 0) {
+        return;
+    }
+
     if (bet > 0){
         placeBet(bet);
         this.style.display = 'none'; // Hide the placeBetButton

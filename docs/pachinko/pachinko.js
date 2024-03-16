@@ -10,7 +10,7 @@ const gameContent = document.getElementById("gameContent");
 const engine = Engine.create({
   gravity: {
     x: 0,
-    y: 0.5,
+    y: 0.2,
   },
 });
 
@@ -30,15 +30,27 @@ const render = Render.create({
 let launchInterval;
 
 document.getElementById('launchBall').addEventListener('click', function() {
-  launchBall();  // start launching balls when the button is clicked
+  let numBalls = parseInt(document.getElementById('ballCost').value);
+  if (numBalls < 0) {
+      return;
+  }
+  launchBall(numBalls);  // start launching balls when the button is clicked
 });
 
 document.getElementById('launchBall').addEventListener('mousedown', function() {
+  let numBalls = parseInt(document.getElementById('ballCost').value);
+  if (numBalls < 0) {
+      return;
+  }
   // start launching balls when the button is held down
   launchInterval = setInterval(launchBall, 115); // adjust the interval as needed
 });
 
 document.getElementById('launchBall').addEventListener('mouseup', function() {
+  let numBalls = parseInt(document.getElementById('ballCost').value);
+  if (numBalls < 0) {
+      return;
+  }
   // stop launching balls when the button is released
   clearInterval(launchInterval);
 });
@@ -115,9 +127,9 @@ window.onload = function () {
 
 // create the pins
 let pins = [];
-const pinRadius = 13; // smaller radius for a game like Pachinko
-const spacing = 90; // spacing between pins
-const rows = 6; // number of rows in the grid
+const pinRadius = 10; // smaller radius for a game like Pachinko
+const spacing = 100; // spacing between pins
+const rows = 8; // number of rows in the grid
 
 // calculate the start coordinates
 const startY = launcher.position.y + launcher.bounds.max.y + spacing * 0.2; // start the pins below the launcher
@@ -143,7 +155,9 @@ for (let i = 0; i < rows; i++) {
           isStatic: true,
           restitution: 1.2, // higher value to make the pins more bouncy
           render: {
-              fillStyle: "#fff",
+            fillStyle: 'transparent', // make the pin not filled
+            strokeStyle: '#f7fff7', // add a border
+            lineWidth: 4 // set the border width
           },
       });
       pins.push(pin);
@@ -171,7 +185,7 @@ let ball = null;
 const numSections = 9; // number of sections
 const sectionWidth = render.canvas.width / numSections; // divide the width by the number of sections
 const sectionHeight = 20; // set the height of the sections
-const borderThickness = 2; // thickness of the borders
+const borderThickness = 4; // thickness of the borders
 const sections = [];
 const sectionStartY = render.canvas.height - sectionHeight / 2; // start the sections at the bottom of the canvas
 for (let i = 0; i < numSections; i++) {
@@ -206,36 +220,54 @@ for (let i = 0; i < numSections; i++) {
       label: "section" + (i + 1) + " - multiplier: " + coins, // give each section a unique label
       coins: coins, // assign a unique coins to each section
       render: {
-        fillStyle: "#777", // set a fill style to make the sections visible
-        textStyle: "#fff" // set the text color to white
+        fillStyle: 'transparent', // make the section not filled
       },
     }
   );
   sections.push(section);
-  if (i < numSections - 1) {
-    // don't create a border after the last section
-    const border = Bodies.rectangle(
-      (i + 1) * sectionWidth - borderThickness / 2,
-      sectionStartY,
-      borderThickness,
-      sectionHeight,
-      {
-        isStatic: true,
-        render: {
-          fillStyle: "black", // set a fill style to make the border visible
-        },
-      }
-    );
-    sections.push(border);
-  }
+    // create the left border
+    if (i > 0) { // don't create a left border for the first section
+        const leftBorder = Bodies.rectangle(
+            i * sectionWidth - borderThickness / 2,
+            sectionStartY,
+            borderThickness,
+            sectionHeight * 1.3, // make the border tall
+            {
+                isStatic: true,
+                restitution: 1.0, // make the borders bouncy
+                label: 'border', // label the borders so we can identify them in the collision event
+                render: {
+                    fillStyle: '#f55' // change the color
+                }
+            }
+        );
+        sections.push(leftBorder);
+    }
+
+    // create the right border
+    if (i < numSections - 1) { // don't create a right border for the last section
+        const rightBorder = Bodies.rectangle(
+            (i + 1) * sectionWidth - borderThickness / 2,
+            sectionStartY,
+            borderThickness,
+            sectionHeight * 1.3, // make the border tall
+            {
+                isStatic: true,
+                restitution: 1.0, // make the borders bouncy
+                label: 'border', // label the borders so we can identify them in the collision event
+                render: {
+                    fillStyle: '#f55' // change the color
+                }
+            }
+        );
+        sections.push(rightBorder);
+    }
 }
 Matter.World.add(engine.world, sections);
 
 // create an array to store all the balls
 
 var balls = [];
-
-
 
 window.launchBall = function () {
     console.log("launchBall function called");
@@ -250,7 +282,7 @@ window.launchBall = function () {
         updateUserCoins(coins); // update the display of the coins
 
         let variation = 100; // replace with the amount of variation you want
-        let randomX = launcher.position.x - variation / 2 + Math.random() * variation;
+        let randomX = launcher.position.x - variation / 1.2 + Math.random() * variation;
 
         let newBall = Bodies.circle(
           randomX,
