@@ -43,6 +43,7 @@ let gameDuration = 30; // Duration of the game in seconds
 
 function startTimer() {
     let timeRemaining = gameDuration;
+    document.getElementById("timer").style.display = 'block';
     document.getElementById("timer").textContent = "Time remaining: " + timeRemaining + "s";
     timerId = setInterval(function() {
         timeRemaining--;
@@ -57,6 +58,8 @@ function startTimer() {
 }
 
 function stopTimer() {
+    document.getElementById("timer").style.display = 'none';
+
     if (timerId !== null) {
         clearInterval(timerId);
         timerId = null;
@@ -101,7 +104,7 @@ function initGame() {
     for (let i = 0; i < 36; i++) {
         let square = document.createElement("div");
         square.id = `square${i}`;
-        square.className = "h-16 w-16 bg-gray-200 border border-gray-300 hover:bg-gray-400 m-0.5";
+        square.className = "h-16 w-16 border-2 border-dashed border-color hover:bg-red-800 m-0.5";
         square.addEventListener("click", function() {
             if (!gameActive) {
                 // If the game is not active, ignore the click
@@ -114,15 +117,15 @@ function initGame() {
                 updateScore();
                 stopTimer(); // Stop the timer when the game is over
                 gameActive = false; // Lock the game when the user loses
-                initGame();
-                this.style.display = 'none'; // Hide the withdrawButton
+                document.getElementById("withdrawButton").style.display = 'none'; // Hide the withdrawButton
                 document.getElementById("placeBetButton").style.display = 'block'; // Show the placeBetButton
+                initGame();
             } else {
                 multiply += scoreIncrement;
                 scoreIncrement += 0.2;
                 updateScore();
                 // Change the color of the square
-                square.style.backgroundColor = "#18181d";
+                square.style.backgroundColor = "#ef4444d9"; ;
                 // Do not reinitialize the game here
             }
         });
