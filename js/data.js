@@ -15,7 +15,7 @@ export function updateUserCoins(change) {
 
     if (typeof change === 'number') {
         console.log("Change value: ", change);
-        coins = change;
+        coins += change;
         localStorage.setItem('coins', coins.toFixed(1)); // Save the updated coin count to localStorage
         updateCoinDisplay(); // Update the coin display
     }
