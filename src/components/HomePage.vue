@@ -167,101 +167,66 @@ export default {
         const data = await response.json();
         if (data.access_token) {
           console.log('Refreshed access token:', data.access_token);
+          sessionStorage.setItem('access_token', data.access_token);
           return data.access_token;
         } else {
           console.error('Failed to refresh access token:', data);
         }
       } catch (error) {
         console.error('Failed to refresh access token:', error);
-        return null;
       }
+      return null;
     },
 
     async handleRequest() {
-      const user = auth.currentUser;
-      if (!user) {
-        console.log('You need to authenticate first');
-        return;
-      }
-
-      console.log('User is authenticated:', user);
-
       try {
         let accessToken = sessionStorage.getItem('access_token');
         if (!accessToken) {
-          console.warn('Access token is missing from session storage, retrieving from Firebase Auth');
           accessToken = await this.getTokenFromFirebaseAuth();
-          if (accessToken) {
-            sessionStorage.setItem('access_token', accessToken);
-            console.log('Access token set in session storage:', accessToken);
-          } else {
-            console.error('Failed to retrieve access token');
-            return;
-          }
         }
 
-        const steps = await getFitnessData(accessToken);
-        if (!steps) {
-          console.error('Failed to fetch the step count data');
-          return;
+        if (!accessToken) {
+          throw new Error('No access token available');
         }
-        console.log('Current step count:', steps);
 
-        const coinsEarned = Math.round((steps / 100) * 10) / 10;
-        console.log('Coins earned:', coinsEarned);
+        const response = await fetch('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            aggregateBy: [{
+              dataTypeName: 'com.google.step_count.delta',
+              dataSourceId: 'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps'
+            }],
+            bucketByTime: { durationMillis: 86400000 },
+            startTimeMillis: new Date().setHours(0, 0, 0, 0),
+            endTimeMillis: new Date().getTime()
+          })
+        });
 
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
-
-        if (userDoc.exists()) {
-          let currentCoins = userDoc.data().coins || 0;
-          currentCoins += coinsEarned;
-
-          console.log('Updating coins:', currentCoins);
-          await setDoc(userRef, { coins: currentCoins }, { merge: true });
-
-          this.$store.commit('updateCoins', currentCoins);
-        } else {
-          console.log('Setting initial coins:', coinsEarned);
-          await setDoc(userRef, { coins: coinsEarned }, { merge: true });
-          this.$store.commit('updateCoins', coinsEarned);
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          console.warn('Access token expired, refreshing...');
-          const newAccessToken = await this.refreshAccessToken();
-          if (newAccessToken) {
-            sessionStorage.setItem('access_token', newAccessToken);
-            this.handleRequest();
-          } else {
-            console.error('Failed to refresh access token');
-          }
-        } else {
-          console.error('Failed to fetch the step count data', error);
-        }
-      }
-    },
-  },
-  mounted() {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        if (navigator.onLine) {
-          try {
-            const userDoc = await getDoc(userRef);
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-              this.$store.commit('updateCoins', userData.coins || 0);
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Token might be expired, try refreshing it
+            accessToken = await this.refreshAccessToken();
+            if (!accessToken) {
+              throw new Error('Failed to refresh access token');
             }
-          } catch (error) {
-            console.error('Failed to fetch user data from Firestore', error);
+            return this.handleRequest(); // Retry with refreshed token
+          } else {
+            throw new Error(`Request failed with status ${response.status}`);
           }
-        } else {
-          console.error('Client is offline');
         }
+
+        const data = await response.json();
+        console.log('Fetched step count data:', data);
+        // Process and use the fetched data
+      } catch (error) {
+        console.error('Failed to fetch the step count data', error);
       }
-    });
-  },
+    }
+  }
 };
 </script>
 
