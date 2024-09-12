@@ -3,7 +3,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA-YuDAXpZgtKgjHyfQXir-J1siWselhDU",
+  apiKey: "AIzaSyCa_Fi6DH0r0Eg-dytRD2Q-Psv705K-Vgk",
   authDomain: "steps-da687.firebaseapp.com",
   projectId: "steps-da687",
   storageBucket: "steps-da687.appspot.com",
