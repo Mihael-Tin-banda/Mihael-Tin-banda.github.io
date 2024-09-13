@@ -10,11 +10,11 @@
 
 ## Kratki opis funkcionalnosti
 
-STEPS je aplikacija koja omogućuje praćenje tjelesnih aktivnosti korisnika, prvenstveno broja koraka. Korisnicima pruža jednostavno i intuitivno korisničko sučelje s mogućnošću prijave putem Google računa, te im omogućuje pregled i analizu prikupljenih podataka o koracima. Aplikacija potiče aktivan način života kroz lako korištenje i praćenje fizičkih aktivnosti.
+STEPS je aplikacija koja omogućuje praćenje tjelesnih aktivnosti korisnika, prvenstveno broja koraka. Korisnicima pruža jednostavno i intuitivno korisničko sučelje s mogućnošću prijave putem Google računa. Prikupljeni koraci pretvaraju se u **KorakKoins**, koje korisnici mogu koristiti za igranje raznih igara unutar aplikacije. Aplikacija potiče aktivan način života kroz zabavan i motivirajući sustav nagrađivanja.
 
 ## Link na javni prototip
 
-[Prototip aplikacije](https://vaš-link-na-prototip.com)
+[Prototip aplikacije](https://mihael-tin-banda.github.io)
 
 ## Zaduženja po članu tima
 
