@@ -1,0 +1,171 @@
+<template>
+  <div class="h-screen overflow-y-auto m-4 bg-gray-200 text-grey-900">
+    <!-- Desktop/Laptop view -->
+    <VueCal
+      v-if="screenType === 'desktop'"
+      ref="calendarDesktop"
+      :events="events"
+      :time="true"
+      :hide-view-selector="true"
+      :disable-views="['years', 'day', 'month']"
+      active-view="week"
+      class="custom-calendar h-full"
+      no-event-text=""
+    />
+
+    <!-- Tablet view -->
+    <VueCal
+      v-if="screenType === 'tablet'"
+      ref="calendarTablet"
+      :events="events"
+      :time="true"
+      :hide-view-selector="true"
+      :disable-views="['years', 'day']"
+      active-view="week"
+      class="tablet-calendar"
+      no-event-text=""
+    />
+
+    <!-- Mobile view -->
+    <VueCal
+      v-if="screenType === 'mobile'"
+      ref="calendarMobile"
+      xsmall
+      :events="events"
+      :time-from="10 * 60"
+      :disable-views="[]"
+      events-count-on-year-view
+      :hide-view-selector="true"
+      :active-view="mobileView"
+      @cell-click="onDayCellClick"
+      @click-date="onDateClick"
+      class="mobile-calendar"
+      no-event-text=""
+    >
+      <template v-if="mobileView === 'day'" #header-left>
+        <button 
+          @click="returnToMonthView" 
+          class="bg-purple-700 hover:bg-purple-500 text-white px-2 py-1 rounded"
+        >
+          &larr; Back
+        </button>
+      </template>
+    </VueCal>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
+import VueCal from 'vue-cal';
+import 'vue-cal/dist/vuecal.css';
+
+const calendarDesktop = ref(null);
+const calendarTablet = ref(null);
+const calendarMobile = ref(null);
+
+const screenType = ref('desktop');
+const mobileView = ref('month');
+const selectedDate = ref(null);
+
+// Update screenType based on window width
+const updateScreenType = () => {
+  if (window.innerWidth < 640) {
+    screenType.value = 'mobile';
+  } else if (window.innerWidth < 1024) {
+    screenType.value = 'tablet';
+  } else {
+    screenType.value = 'desktop';
+  }
+};
+
+// Handle day cell click in mobile view
+const onDayCellClick = (cell, event) => {
+  if (screenType.value === 'mobile' && mobileView.value === 'month') {
+    selectedDate.value = cell.date;
+    mobileView.value = 'day';
+    
+    // If you need to navigate to the specific date
+    if (calendarMobile.value) {
+      calendarMobile.value.switchToDate(cell.date);
+    }
+  }
+};
+
+// Handle date click in mobile view
+const onDateClick = (date) => {
+  if (screenType.value === 'mobile' && mobileView.value === 'month') {
+    selectedDate.value = date;
+    mobileView.value = 'day';
+  }
+};
+
+// Return to month view
+const returnToMonthView = () => {
+  mobileView.value = 'month';
+};
+
+// Set up event listener for resize events
+onMounted(() => {
+  updateScreenType(); // Initial check
+  window.addEventListener('resize', updateScreenType);
+});
+
+// Clean up event listener when component is destroyed
+onUnmounted(() => {
+  window.removeEventListener('resize', updateScreenType);
+});
+
+// Example events
+const events = ref([
+  { start: '2025-03-06 09:00', end: '2025-03-06 13:00', title: 'Upravljanje troškovima (338 - P4)', class: 'bg-red-500' },
+  { start: '2025-03-04 12:00', end: '2025-03-04 14:00', title: 'Upravljanje mrežnim sustavima (312 - Info2)', class: 'bg-blue-500' },
+  { start: '2025-03-05 12:00', end: '2025-03-05 14:00', title: 'Upravljanje mrežnim sustavima (338 - P4)', class: 'bg-blue-500' },
+  { start: '2025-03-04 14:00', end: '2025-03-04 18:00', title: 'Sustavi temeljeni na znanju (132)', class: 'bg-red-600' },
+  { start: '2025-03-04 14:00', end: '2025-03-04 18:00', title: 'Teorija informacija (132)', class: 'bg-red-600' },
+]);
+</script>
+
+<style scoped>
+.vuecal__no-event {
+  color: transparent;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.custom-calendar {
+  height: calc(100vh - 2rem);
+}
+
+.tablet-calendar {
+  height: calc(100vh - 2rem);
+}
+
+.mobile-calendar {
+  height: auto;
+  min-height: 500px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .tablet-calendar {
+    height: auto;
+    min-height: 600px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-calendar {
+    min-height: 400px;
+  }
+  
+  .m-4 {
+    margin: 0.5rem;
+  }
+}
+</style>
