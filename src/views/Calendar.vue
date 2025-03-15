@@ -115,14 +115,20 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateScreenType);
 });
 
-// Example events
-const events = ref([
-  { start: '2025-03-06 09:00', end: '2025-03-06 13:00', title: 'Upravljanje troškovima (338 - P4)', class: 'bg-red-500' },
-  { start: '2025-03-04 12:00', end: '2025-03-04 14:00', title: 'Upravljanje mrežnim sustavima (312 - Info2)', class: 'bg-blue-500' },
-  { start: '2025-03-05 12:00', end: '2025-03-05 14:00', title: 'Upravljanje mrežnim sustavima (338 - P4)', class: 'bg-blue-500' },
-  { start: '2025-03-04 14:00', end: '2025-03-04 18:00', title: 'Sustavi temeljeni na znanju (132)', class: 'bg-red-600' },
-  { start: '2025-03-04 14:00', end: '2025-03-04 18:00', title: 'Teorija informacija (132)', class: 'bg-red-600' },
-]);
+// UCITAVANJE PODATAKA
+
+import axios from 'axios';
+
+const events = ref([]);
+
+onMounted(async () => {
+  try{
+    const response = await axios.get('https://eventium-backend.onrender.com/events');
+    events.value = response.data;
+  } catch(error) {
+    console.error('Greska u dohvatu podataka', error);
+  }
+});
 </script>
 
 <style scoped>
