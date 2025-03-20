@@ -1,17 +1,25 @@
 <template>
     <div class="max-w-[400] mx-auto p-6 bg-white shadow-md rounded-lg">
       <!-- Kalendar -->
-      <div class="rounded-xl p-3">
+      <div class="rounded-xl">
         <vue-cal
-          selected-date="2018-11-19"
-          xsmall
-          hide-view-selector
-          :time-from="10 * 60"
-          :disable-views="['day']"
-          events-count-on-year-view
-          active-view="month"
-          :events="events">
-        </vue-cal>
+        xsmall
+        hide-view-selector
+        :disable-views="['year', 'week', 'day']"
+        :events="events"
+        :editable-events="false"
+        :clickable-events="false"
+        :draggable-events="false"
+        :time="false"
+        active-view="month"
+        :time-from="0"
+        :time-to="24"
+        :on-event-click="() => {}"
+        :on-cell-click="() => {}"
+        :cell-click-hold="false"
+        class="p-4"
+        >
+      </vue-cal>
       </div>
 
       <!-- Karta dogadaja -->
