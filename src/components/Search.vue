@@ -31,12 +31,11 @@
       <!-- Add button to create new event -->
       <button 
         @click="openCreateEventModal" 
-        class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition duration-300 flex items-center"
+        class="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-md transition duration-300 flex items-center"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Create Event
       </button>
     </div>
     
