@@ -4,10 +4,19 @@
     <div class="lg:col-span-3 overflow-y-auto pr-2 pb-20 max-h-screen">
       <div class="p-3">
         <h1 class="font-bold text-5xl md:text-7xl text-gray-800 mb-8">Home</h1>
+
+        <Search @search="updateSearch" />
+        
+        <div v-if="filteredEvents.length === 0" class="text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-gray-500 mt-4 text-lg">No events found matching "{{ searchQuery }}"</p>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <div v-for="event in events" :key="event._id" class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
+        <div v-for="event in filteredEvents" :key="event._id" class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
           <div class="p-4">
             <h2 class="text-lg font-medium text-gray-900 mb-2">{{ event.title }}</h2>
             <p class="text-sm text-gray-500">Start: {{ formatDate(event.start) }}</p>
@@ -89,11 +98,27 @@
 
 <script setup>
 import SideCal from '../components/SideCal.vue';
+import Search from '../components/Search.vue';
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 
 const events = ref([]);
 const selectedEvent = ref(null);
+const searchQuery = ref('');
+
+// Computed property for filtered events
+const filteredEvents = computed(() => {
+  if (!searchQuery.value.trim()) return privateEvents.value;
+  
+  const query = searchQuery.value.toLowerCase().trim();
+  return privateEvents.value.filter(event => 
+    event.title.toLowerCase().includes(query)
+  );
+});
+
+const privateEvents = computed(() => {
+  return events.value.filter(event => event.type === "private");
+});
 
 onMounted(async () => {
   try{
@@ -103,6 +128,10 @@ onMounted(async () => {
     console.error('Greska u dohvatu podataka', error);
   }
 });
+
+const updateSearch = (query) => {
+  searchQuery.value = query;
+};
 
 const openEventDetails = (event) => {
   selectedEvent.value = event;

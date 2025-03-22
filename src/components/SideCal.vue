@@ -1,12 +1,11 @@
 <template>
     <div class="max-w-[400] mx-auto p-6 bg-white shadow-md rounded-lg">
-      <!-- Kalendar -->
       <div class="rounded-xl">
         <vue-cal
         xsmall
         hide-view-selector
         :disable-views="['year', 'week', 'day']"
-        :events="events"
+        :events="privateEvents"
         :editable-events="false"
         :clickable-events="false"
         :draggable-events="false"
@@ -21,8 +20,6 @@
         >
       </vue-cal>
       </div>
-
-      <!-- Karta dogadaja -->
     </div>
   
   </template>
@@ -31,7 +28,7 @@
     import VueCal from 'vue-cal';
     import 'vue-cal/dist/vuecal.css';
     import axios from 'axios';
-    import { onMounted, ref } from 'vue';
+    import { onMounted, ref, computed } from 'vue';
 
     const events = ref([]);
 
@@ -42,6 +39,10 @@
       } catch(error) {
         console.error('Greska u dohvatu podataka', error);
       }
+    });
+
+    const privateEvents = computed(() => {
+      return events.value.filter(event => event.type === "private");
     });
   </script>
   

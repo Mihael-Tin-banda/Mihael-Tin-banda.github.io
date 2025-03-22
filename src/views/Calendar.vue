@@ -4,7 +4,7 @@
     <VueCal
       v-if="screenType === 'desktop'"
       ref="calendarDesktop"
-      :events="events"
+      :events="privateEvents"
       :time="true"
       :hide-view-selector="true"
       :disable-views="['years', 'day', 'month']"
@@ -17,7 +17,7 @@
     <VueCal
       v-if="screenType === 'tablet'"
       ref="calendarTablet"
-      :events="events"
+      :events="privateEvents"
       :time="true"
       :hide-view-selector="true"
       :disable-views="['years', 'day']"
@@ -31,7 +31,7 @@
       v-if="screenType === 'mobile'"
       ref="calendarMobile"
       xsmall
-      :events="events"
+      :events="privateEvents"
       :time-from="10 * 60"
       :disable-views="[]"
       events-count-on-year-view
@@ -55,9 +55,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
+import axios from 'axios';
 
 const calendarDesktop = ref(null);
 const calendarTablet = ref(null);
@@ -67,7 +68,6 @@ const screenType = ref('desktop');
 const mobileView = ref('month');
 const selectedDate = ref(null);
 
-// Update screenType based on window width
 const updateScreenType = () => {
   if (window.innerWidth < 640) {
     screenType.value = 'mobile';
@@ -78,20 +78,17 @@ const updateScreenType = () => {
   }
 };
 
-// Handle day cell click in mobile view
 const onDayCellClick = (cell, event) => {
   if (screenType.value === 'mobile' && mobileView.value === 'month') {
     selectedDate.value = cell.date;
     mobileView.value = 'day';
     
-    // If you need to navigate to the specific date
     if (calendarMobile.value) {
       calendarMobile.value.switchToDate(cell.date);
     }
   }
 };
 
-// Handle date click in mobile view
 const onDateClick = (date) => {
   if (screenType.value === 'mobile' && mobileView.value === 'month') {
     selectedDate.value = date;
@@ -99,30 +96,28 @@ const onDateClick = (date) => {
   }
 };
 
-// Return to month view
 const returnToMonthView = () => {
   mobileView.value = 'month';
 };
 
-// Set up event listener for resize events
 onMounted(() => {
-  updateScreenType(); // Initial check
+  updateScreenType();
   window.addEventListener('resize', updateScreenType);
 });
 
-// Clean up event listener when component is destroyed
 onUnmounted(() => {
   window.removeEventListener('resize', updateScreenType);
 });
 
 // UCITAVANJE PODATAKA
-
-import axios from 'axios';
-
 const events = ref([]);
 
+const privateEvents = computed(() => {
+  return events.value.filter(event => event.type === "private");
+});
+
 onMounted(async () => {
-  try{
+  try {
     const response = await axios.get('https://eventium-backend.onrender.com/events');
     events.value = response.data;
   } catch(error) {
