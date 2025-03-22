@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-[400] mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div class="hidden lg:block max-w-[400] mx-auto p-6 bg-white shadow-md rounded-lg">
       <div class="rounded-xl">
         <vue-cal
         xsmall

@@ -5,7 +5,10 @@
       <div class="p-3">
         <h1 class="font-bold text-5xl md:text-7xl text-gray-800 mb-8">Home</h1>
 
-        <Search @search="updateSearch" />
+        <Search 
+          @search="updateSearch" 
+          @event-created="handleEventCreated" 
+        />
         
         <div v-if="filteredEvents.length === 0" class="text-center py-12">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,6 +175,11 @@ const formatDate = (dateString) => {
   } catch (e) {
     return dateString;
   }
+};
+
+// Handle newly created event
+const handleEventCreated = (newEvent) => {
+  events.value.push(newEvent);
 };
 </script>
 
