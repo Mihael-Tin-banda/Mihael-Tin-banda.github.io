@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen h-screen w-screen p-2 sm:p-4 box-border">
     <div class="rounded-2xl bg-gray-200 flex flex-col sm:flex-row h-full overflow-hidden">
-      <Nav class="z-50" />
+      <Nav v-if="isAuthenticated" class="z-50" />
 
       <div class="flex-1 overflow-hidden">
         <RouterView />
@@ -12,7 +12,20 @@
 
 <script setup>
 import Nav from './components/Nav.vue';
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+const isAuthenticated = ref(false);
+
+const checkAuth = () => {
+  isAuthenticated.value = !!localStorage.getItem('token');
+  
+  if (!isAuthenticated.value && route.meta.requiresAuth) {
+    router.push('/login');
+  }
+};
 
 onMounted(() => {
   const setVhVariable = () => {
@@ -21,13 +34,23 @@ onMounted(() => {
   };
 
   setVhVariable();
-
   window.addEventListener('resize', setVhVariable);
+  
+  checkAuth();
+  
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'token') {
+      checkAuth();
+    }
+  });
 
   return () => {
     window.removeEventListener('resize', setVhVariable);
+    window.removeEventListener('storage', checkAuth);
   };
 });
+
+watch(() => route.path, checkAuth);
 </script>
 
 <style>
@@ -39,7 +62,7 @@ html, body {
 }
 
 .h-screen {
-  height: 100vh; /* Fallback */
+  height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
 }
 </style>
