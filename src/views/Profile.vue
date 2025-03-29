@@ -60,14 +60,31 @@ const userName = ref('');
 const userUsername = ref('');
 
 onMounted(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.warn('No authentication token found, redirecting to login');
+    router.push('/login');
+    return;
+  }
+
   try {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (userData) {
+    const userDataString = localStorage.getItem('user');
+    
+    if (userDataString && userDataString !== 'undefined' && userDataString !== 'null') {
+      const userData = JSON.parse(userDataString);
       userName.value = userData.name || 'User';
-      userUsername.value = userData.username || 'username';
+      userUsername.value = userData.username || userData.name || 'username';
+    } else {
+      userName.value = 'User';
+      userUsername.value = 'username';
+      console.warn('No valid user data found in localStorage');
     }
   } catch (error) {
     console.error('Error parsing user data:', error);
+    userName.value = 'User';
+    userUsername.value = 'username';
+    
+    localStorage.removeItem('user');
   }
 });
 

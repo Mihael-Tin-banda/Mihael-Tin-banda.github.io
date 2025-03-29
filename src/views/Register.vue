@@ -120,11 +120,14 @@ const handleRegister = async () => {
       username: username.value,
       password: password.value
     });
-    
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('user', JSON.stringify(response.data.user));
-    
-    window.location.href = '/#/';
+
+    router.push({
+      path: '/login',
+      query: { 
+        newUser: 'true',
+        username: username.value 
+      }
+    });
   } catch (error) {
     console.error('Registration error:', error);
     errorMessage.value = error.response?.data?.message || 'Failed to create account. Please try again later.';
