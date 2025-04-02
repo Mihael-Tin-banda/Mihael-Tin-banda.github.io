@@ -344,7 +344,7 @@ const submitEvent = async () => {
   apiError.value = null;
   
   try {
-    // Format dates for your API in YYYY-MM-DD HH:MM format
+    // Format dates exactly as required by your API
     const formatDateForApi = (dateString) => {
       const date = new Date(dateString);
       const year = date.getFullYear();
@@ -353,7 +353,7 @@ const submitEvent = async () => {
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       
-      // Use exact format expected by your API
+      // Use exactly this format as expected by your backend
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
     
@@ -364,7 +364,7 @@ const submitEvent = async () => {
       end: formatDateForApi(newEvent.value.end),
       class: newEvent.value.class,
       type: newEvent.value.type
-      // Don't include author - it will be extracted from the JWT in your middleware
+      // author will be extracted from JWT on the backend
     };
     
     console.log('Sending event data:', eventData);
@@ -393,14 +393,14 @@ const submitEvent = async () => {
   } catch (error) {
     console.error('Error creating event:', error);
     
-    // Log detailed error information
+    // Log detailed error information for debugging
     if (error.response) {
       console.error('Server responded with:', {
         status: error.response.status,
         data: error.response.data
       });
       
-      // More detailed error message
+      // Handle validation errors
       if (error.response?.data?.errors && error.response.data.errors.length > 0) {
         // Handle express-validator errors
         apiError.value = error.response.data.errors.map(err => err.msg).join(', ');
