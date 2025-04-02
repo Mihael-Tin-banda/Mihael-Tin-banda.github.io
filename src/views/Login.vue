@@ -74,23 +74,25 @@ onMounted(() => {
 
 const handleLogin = async () => {
   try {
-    errorMessage.value = '';
-    isLoading.value = true;
-    
     const response = await axios.post('https://eventium-backend.onrender.com/login', {
       username: username.value,
       password: password.value
     });
     
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('user', JSON.stringify(response.data.user));
-    
-    window.location.href = '/#/';
+    if (response.data?.jwt_token) {
+      localStorage.setItem('token', response.data.jwt_token);
+      
+      const userResponse = await axios.get('https://eventium-backend.onrender.com/users/me', {
+        headers: { Authorization: `Bearer ${response.data.jwt_token}` }
+      });
+      
+      localStorage.setItem('user', JSON.stringify(userResponse.data));
+      
+      router.push('/');
+    }
   } catch (error) {
-    console.error('Login error:', error);
-    errorMessage.value = error.response?.data?.message || 'Failed to login. Please check your credentials.';
-  } finally {
-    isLoading.value = false;
+    console.error('Login failed:', error);
+    errorMessage.value = 'Login failed. Please check your credentials.';
   }
 };
 </script>

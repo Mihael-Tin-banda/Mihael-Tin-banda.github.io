@@ -68,6 +68,21 @@
               >
             </div>
             
+            <!-- Added Description Field -->
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="event-description">
+                Event Description (Optional)
+              </label>
+              <textarea 
+                v-model="newEvent.description" 
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                id="event-description" 
+                name="event-description"
+                rows="3"
+                placeholder="Enter event description"
+              ></textarea>
+            </div>
+            
             <div class="mb-4">
               <label class="block text-gray-700 text-sm font-bold mb-2" for="event-start-date">
                 Start Date & Time
@@ -164,6 +179,11 @@
               </fieldset>
             </div>
             
+            <!-- Added API Error Message -->
+            <div v-if="apiError" class="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+              {{ apiError }}
+            </div>
+            
             <div class="flex items-center justify-end space-x-3">
               <button 
                 type="button"
@@ -192,16 +212,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
+// Uncomment this import since you have the auth utilities
+import { isAuthenticated as checkAuth, parseJwt } from '../utils/auth';
 
 const searchQuery = ref('');
 const showCreateModal = ref(false);
 const isSubmitting = ref(false);
+const isAuthenticated = ref(false);
+const userToken = ref('');
 
-// Initialize new event data
+// Add new state variables for better error handling
+const apiError = ref(null);
+const isLoading = ref(false);
+
+// Initialize new event data with description
 const newEvent = ref({
   title: '',
+  description: '',
   start: '',
   end: '',
   class: 'bg-purple-300',
@@ -209,6 +238,22 @@ const newEvent = ref({
 });
 
 const emit = defineEmits(['search', 'eventCreated']);
+
+onMounted(() => {
+  // Use the auth utility for checking authentication
+  isAuthenticated.value = checkAuth();
+  
+  if (isAuthenticated.value) {
+    const token = localStorage.getItem('token');
+    userToken.value = token;
+    
+    // Use the parseJwt utility to get user info
+    const userData = parseJwt(token);
+    if (userData) {
+      console.log('Authenticated as:', userData.username);
+    }
+  }
+});
 
 const emitSearch = () => {
   emit('search', searchQuery.value);
@@ -219,8 +264,30 @@ const clearSearch = () => {
   emit('search', '');
 };
 
+// Date validation function
+const validateDates = () => {
+  const startDate = new Date(newEvent.value.start);
+  const endDate = new Date(newEvent.value.end);
+  
+  if (endDate <= startDate) {
+    apiError.value = 'End time must be after start time';
+    return false;
+  }
+  
+  return true;
+};
+
 // Open create event modal
 const openCreateEventModal = () => {
+  // Reset any previous errors
+  apiError.value = null;
+  
+  // Check if user is authenticated using your utility
+  if (!checkAuth()) {
+    alert('Please log in to create events');
+    return;
+  }
+
   // Set default start and end times
   const now = new Date();
   const startDate = new Date(now);
@@ -242,6 +309,7 @@ const openCreateEventModal = () => {
   
   newEvent.value = {
     title: '',
+    description: '',
     start: formatForInput(startDate),
     end: formatForInput(endDate),
     class: 'bg-purple-300',
@@ -253,19 +321,30 @@ const openCreateEventModal = () => {
 
 const closeCreateModal = () => {
   showCreateModal.value = false;
+  apiError.value = null;
 };
 
-// Create a new event
+// Create a new event with improved error handling
 const submitEvent = async () => {
+  if (!checkAuth()) {
+    alert('You must be logged in to create events');
+    return;
+  }
+
   if (!newEvent.value.title || !newEvent.value.start || !newEvent.value.end) {
-    alert('Please fill out all fields');
+    apiError.value = 'Please fill out all required fields';
+    return;
+  }
+  
+  if (!validateDates()) {
     return;
   }
   
   isSubmitting.value = true;
+  apiError.value = null;
   
   try {
-    // Format dates to match the API's expected format "YYYY-MM-DD HH:MM"
+    // Format dates for your API in YYYY-MM-DD HH:MM format
     const formatDateForApi = (dateString) => {
       const date = new Date(dateString);
       const year = date.getFullYear();
@@ -274,21 +353,38 @@ const submitEvent = async () => {
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       
+      // Use exact format expected by your API
       return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
     
     const eventData = {
       title: newEvent.value.title,
+      description: newEvent.value.description || "",
       start: formatDateForApi(newEvent.value.start),
       end: formatDateForApi(newEvent.value.end),
       class: newEvent.value.class,
       type: newEvent.value.type
+      // Don't include author - it will be extracted from the JWT in your middleware
     };
     
-    const response = await axios.post('https://eventium-backend.onrender.com/events', eventData);
+    console.log('Sending event data:', eventData);
+    
+    const token = localStorage.getItem('token');
+    const response = await axios.post(
+      'https://eventium-backend.onrender.com/events', 
+      eventData,
+      { 
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        } 
+      }
+    );
+    
+    console.log('API response:', response.data);
     
     // Emit event with the newly created event data
-    emit('eventCreated', response.data);
+    emit('eventCreated', response.data.event);
     
     closeCreateModal();
     
@@ -296,7 +392,30 @@ const submitEvent = async () => {
     alert('Event created successfully!');
   } catch (error) {
     console.error('Error creating event:', error);
-    alert('Failed to create event. Please try again.');
+    
+    // Log detailed error information
+    if (error.response) {
+      console.error('Server responded with:', {
+        status: error.response.status,
+        data: error.response.data
+      });
+      
+      // More detailed error message
+      if (error.response?.data?.errors && error.response.data.errors.length > 0) {
+        // Handle express-validator errors
+        apiError.value = error.response.data.errors.map(err => err.msg).join(', ');
+      } else if (error.response?.data?.message) {
+        apiError.value = error.response.data.message;
+      } else if (error.response?.data) {
+        apiError.value = typeof error.response.data === 'string' 
+          ? error.response.data 
+          : JSON.stringify(error.response.data);
+      } else {
+        apiError.value = `Server error (${error.response.status})`;
+      }
+    } else {
+      apiError.value = 'Failed to create event. Please try again.';
+    }
   } finally {
     isSubmitting.value = false;
   }

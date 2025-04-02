@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-8 max-h-[90vh] overflow-y-auto">
       <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Create Account</h1>
       
       <div v-if="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
@@ -8,22 +8,46 @@
       </div>
 
       <form @submit.prevent="handleRegister" class="space-y-4">
-        <!-- <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+        <div>
+          <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
           <input 
             type="text" 
-            id="name" 
-            v-model="name" 
+            id="firstName" 
+            v-model="firstName" 
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="John Doe"
+            placeholder="John"
           />
-        </div> -->
+        </div>
+        
+        <div>
+          <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+          <input 
+            type="text" 
+            id="lastName" 
+            v-model="lastName" 
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="Doe"
+          />
+        </div>
+        
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            v-model="email" 
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="your.email@example.com"
+          />
+        </div>
         
         <div>
           <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
           <input 
-            type="username" 
+            type="text" 
             id="username" 
             v-model="username" 
             required
@@ -89,7 +113,9 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const router = useRouter();
-const name = ref('');
+const firstName = ref('');
+const lastName = ref('');
+const email = ref('');
 const username = ref('');
 const password = ref('');
 const confirmPassword = ref('');
@@ -116,7 +142,9 @@ const handleRegister = async () => {
     isLoading.value = true;
     
     const response = await axios.post('https://eventium-backend.onrender.com/register', {
-    //   name: name.value,
+      ime: firstName.value,
+      prezime: lastName.value,
+      email: email.value,
       username: username.value,
       password: password.value
     });
@@ -136,3 +164,24 @@ const handleRegister = async () => {
   }
 };
 </script>
+
+<style scoped>
+/* Custom scrollbar styling */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #c084fc;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+</style>

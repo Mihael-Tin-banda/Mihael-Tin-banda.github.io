@@ -23,13 +23,18 @@
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="p-4 bg-gray-50 rounded-lg">
-              <span class="block text-sm font-medium text-gray-500 mb-1">Name</span>
+              <span class="block text-sm font-medium text-gray-500 mb-1">Full Name</span>
               <span class="text-gray-800">{{ userName }}</span>
             </div>
             
             <div class="p-4 bg-gray-50 rounded-lg">
               <span class="block text-sm font-medium text-gray-500 mb-1">Username</span>
               <span class="text-gray-800">{{ userUsername }}</span>
+            </div>
+            
+            <div class="p-4 bg-gray-50 rounded-lg">
+              <span class="block text-sm font-medium text-gray-500 mb-1">Email</span>
+              <span class="text-gray-800">{{ userEmail }}</span>
             </div>
           </div>
         </div>
@@ -54,37 +59,34 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { getAuthUser, isAuthenticated } from '../utils/auth'; // Update the path as needed
 
 const router = useRouter();
-const userName = ref('');
-const userUsername = ref('');
+const userName = ref('User');
+const userUsername = ref('username');
+const userEmail = ref('');
 
 onMounted(() => {
-  const token = localStorage.getItem('token');
-  if (!token) {
+  if (!isAuthenticated()) {
     console.warn('No authentication token found, redirecting to login');
     router.push('/login');
     return;
   }
 
-  try {
-    const userDataString = localStorage.getItem('user');
-    
-    if (userDataString && userDataString !== 'undefined' && userDataString !== 'null') {
-      const userData = JSON.parse(userDataString);
-      userName.value = userData.name || 'User';
-      userUsername.value = userData.username || userData.name || 'username';
-    } else {
-      userName.value = 'User';
-      userUsername.value = 'username';
-      console.warn('No valid user data found in localStorage');
+  const userData = getAuthUser();
+  
+  if (userData) {
+    // Use the fields exactly as they are in your MongoDB
+    if (userData.ime && userData.prezime) {
+      userName.value = `${userData.ime} ${userData.prezime}`;
+    } else if (userData.ime) {
+      userName.value = userData.ime;
     }
-  } catch (error) {
-    console.error('Error parsing user data:', error);
-    userName.value = 'User';
-    userUsername.value = 'username';
     
-    localStorage.removeItem('user');
+    userUsername.value = userData.username || 'username';
+    userEmail.value = userData.email || '';
+  } else {
+    console.warn('No valid user data found in localStorage');
   }
 });
 
@@ -94,4 +96,5 @@ const handleLogout = () => {
   
   router.push('/login');
 };
+
 </script>
