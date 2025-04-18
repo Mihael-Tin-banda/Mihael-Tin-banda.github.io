@@ -1,5 +1,5 @@
 <template>
-  <div class="hidden lg:block max-w-[400px] mx-auto bg-white shadow-md rounded-xl">
+  <div class="hidden lg:block max-w-[400px] mx-auto bg-white shadow-md rounded-xl overflow-hidden">
       <vue-cal
         xsmall
         hide-view-selector

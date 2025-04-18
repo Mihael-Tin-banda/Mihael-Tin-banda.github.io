@@ -7,12 +7,13 @@
         ref="map" 
         :zoom="zoom" 
         :center="initialCenter"
-        style="height: 400px; width: 100%"
+        style="height: 380px; width: 100%"
       >
         <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
         
+        <!-- Display markers only if events with coordinates exist -->
         <l-marker 
-          v-for="(event, index) in props.events"
+          v-for="(event, index) in eventsWithCoordinates"
           :key="index"
           :lat-lng="event.coordinates"
         >
@@ -34,8 +35,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from 'vue';
-import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet';
+import { ref, onMounted, defineProps, computed } from 'vue';
+import { LMap, LTileLayer, LMarker, LPopup, LControl } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -47,8 +48,20 @@ import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
 const props = defineProps({
   events: {
     type: Array,
-    required: true
+    required: false,
+    default: () => []
   }
+});
+
+// Filter events to only include those with valid coordinates
+const eventsWithCoordinates = computed(() => {
+  return props.events.filter(event => 
+    event.coordinates && 
+    Array.isArray(event.coordinates) && 
+    event.coordinates.length === 2 &&
+    !isNaN(event.coordinates[0]) && 
+    !isNaN(event.coordinates[1])
+  );
 });
 
 // Leaflet ikone fix za Vite
@@ -106,5 +119,11 @@ const formatDate = (dateString) => {
   justify-content: center;
   background: #f9f9f9;
   border-radius: 0.75rem;
+}
+
+.map-info-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 </style>

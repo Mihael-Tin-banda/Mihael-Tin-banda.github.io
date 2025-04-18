@@ -110,13 +110,12 @@
     
     <!-- SIDEBAR COMPONENTS -->
     <!-- Desktop Layout -->
-    <div class="hidden lg:block lg:overflow-y-auto max-h-screen">
+    <div class="hidden lg:block lg:overflow-y-auto max-h-screen z-0">
       <SideCal />
       
       <SideMap 
-        v-if="isAuthenticated && filteredEventsWithCoordinates.length > 0"
         :events="filteredEventsWithCoordinates"
-        class="py-4"
+        class="mt-4"
       />
     </div>
     

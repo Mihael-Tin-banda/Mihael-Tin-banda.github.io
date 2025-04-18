@@ -1,35 +1,35 @@
 <template>
-    <div class="map-picker h-96">
-      <div class="mb-4">
-        <div class="flex items-center">
-          <input 
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search for a location..."
-            class="flex-grow shadow appearance-none border rounded py-2 px-3 mr-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            @keyup.enter="searchLocation"
-          />
-          <button 
-            @click="searchLocation" 
-            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
-          >
-            Search
-          </button>
-        </div>
-      </div>
-      
-      <div id="map" ref="mapContainer" class="h-full rounded-lg shadow-md"></div>
-      
-      <div v-if="selectedLocation" class="selected-location mt-4 p-3 bg-green-100 border border-green-300 rounded-lg">
-        <p class="font-semibold text-green-800">✓ Location selected:</p>
-        <p>{{ selectedAddress || 'Location coordinates: ' + selectedLocation.join(', ') }}</p>
-      </div>
-  
-      <div v-else class="selected-location mt-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
-        <p class="text-gray-600">Click on the map to select a location</p>
+  <div class="map-picker">
+    <div class="mb-4">
+      <div class="flex items-center">
+        <input 
+          type="text"
+          v-model="searchQuery"
+          placeholder="Search for a location..."
+          class="flex-grow shadow appearance-none border rounded py-2 px-3 mr-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          @keyup.enter="searchLocation"
+        />
+        <button 
+          @click="searchLocation" 
+          class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md"
+        >
+          Search
+        </button>
       </div>
     </div>
-  </template>
+    
+    <div id="map" ref="mapContainer" class="h-64 rounded-lg shadow-md"></div>
+    
+    <div v-if="selectedLocation" class="selected-location mt-4 p-3 bg-green-100 border border-green-300 rounded-lg">
+      <p class="font-semibold text-green-800">✓ Location selected:</p>
+      <p class="truncate">{{ selectedAddress || 'Location coordinates: ' + selectedLocation.join(', ') }}</p>
+    </div>
+
+    <div v-else class="selected-location mt-4 p-3 bg-gray-100 border border-gray-300 rounded-lg">
+      <p class="text-gray-600">Click on the map to select a location</p>
+    </div>
+  </div>
+</template>
   
   <script setup>
   import { ref, onMounted, onBeforeUnmount } from 'vue';
@@ -189,10 +189,22 @@
   <style scoped>
   .map-picker {
     width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
   
-  /* Force height for Leaflet container */
+  /* Set the map to take available space but allow scrolling if needed */
   #map {
-    min-height: 300px;
+    min-height: 250px;
+    max-height: 300px;
+    flex-grow: 1;
+  }
+  
+  /* Make the address text wrap or truncate */
+  .selected-location p {
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   </style>
