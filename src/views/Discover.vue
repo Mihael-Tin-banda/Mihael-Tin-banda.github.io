@@ -90,6 +90,23 @@
               <span class="text-gray-700">End: {{ formatDate(selectedEvent.end) }}</span>
             </div>
             
+            <div :class="{ hidden: selectedEvent.description?.length === 0 }" class="flex flex-col mb-4">
+              <span class="text-gray-700 font-bold mb-4">Event description</span>
+              <span class="text-gray-700 bg-gray-100 rounded-2xl p-4">{{ selectedEvent.description }}</span>
+            </div>
+
+            <div v-if="selectedEvent.location?.coordinates" class="flex flex-col mb-4">
+              <span class="text-gray-700 font-bold mb-2">Location</span>
+              <!-- Mini map -->
+              <div class="h-48 rounded-lg overflow-hidden shadow-md">
+                <LocationMap 
+                  :coordinates="[selectedEvent.location.coordinates[1], selectedEvent.location.coordinates[0]]"
+                  :title="selectedEvent.title"
+                  :address="selectedEvent.location.address || formatCoordinates(selectedEvent.location.coordinates)"
+                />
+              </div>
+            </div>
+            
             <div v-if="selectedEvent.authorName" class="flex items-center mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -97,11 +114,11 @@
               <span class="text-gray-700">Created by: {{ selectedEvent.authorName }}</span>
             </div>
             
-            <div class="flex items-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <div v-if="hasJoinedEvent(selectedEvent._id)" class="flex items-center mb-4 text-green-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span class="text-gray-700">Type: {{ selectedEvent.type === 'public' ? 'Public' : 'Private' }}</span>
+              <span>Joined event</span>
             </div>
           </div>
           
@@ -185,6 +202,7 @@
 
 <script setup>
 import Search from '../components/Search.vue';
+import LocationMap from '../components/LocationMap.vue';
 import axios from 'axios';
 import { onMounted, ref, computed } from 'vue';
 import { parseJwt, isAuthenticated } from '../utils/auth'; // Update the path as needed
@@ -385,6 +403,16 @@ const canDeleteEvent = (event) => {
   
   // User can delete if they are the author
   return event.author === userId.value;
+};
+
+// Format coordinates for map display
+const formatCoordinates = (coordinates) => {
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+    return 'Location unavailable';
+  }
+  
+  // Format as latitude, longitude with 6 decimal places
+  return `${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`;
 };
 </script>
 

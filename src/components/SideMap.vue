@@ -19,8 +19,7 @@
         >
           <l-popup>
             <h3 class="font-bold">{{ event.title }}</h3>
-            <p class="text-sm text-gray-700">Start: {{ formatDate(event.start) }}</p>
-            <p class="text-sm text-gray-700">End: {{ formatDate(event.end) }}</p>
+
             <button 
               @click="viewDetails(event)"
               class="mt-2 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 text-sm rounded-md transition duration-300"
@@ -35,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps, computed } from 'vue';
+import { ref, onMounted, defineProps, computed, defineEmits } from 'vue';
 import { LMap, LTileLayer, LMarker, LPopup, LControl } from '@vue-leaflet/vue-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -44,6 +43,8 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+
+const emit = defineEmits(['event-selected', 'delete-event']);
 
 const props = defineProps({
   events: {
@@ -89,10 +90,11 @@ onMounted(() => {
 });
 
 const viewDetails = (event) => {
-  console.log('Event details:', event);
+  // Just emit the event to the parent, don't manage local state
+  emit('event-selected', event);
 };
 
-// Format date for display
+// Keep the formatting functions for the popup display
 const formatDate = (dateString) => {
   if (!dateString) return '';
 
@@ -108,6 +110,15 @@ const formatDate = (dateString) => {
   } catch (e) {
     return dateString;
   }
+};
+
+const formatCoordinates = (coordinates) => {
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+    return 'Location unavailable';
+  }
+  
+  // Format as latitude, longitude with 6 decimal places
+  return `${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`;
 };
 </script>
 

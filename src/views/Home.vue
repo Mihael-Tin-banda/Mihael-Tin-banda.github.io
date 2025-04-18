@@ -81,12 +81,23 @@
               <span class="text-gray-700">End: {{ formatDate(selectedEvent.end) }}</span>
             </div>
             
-            <div class="flex items-center mb-4">
-              <span 
-                class="w-4 h-4 rounded-full mr-2" 
-                :class="selectedEvent.class">
-              </span>
-              <span class="text-gray-700">Category Color</span>
+            <div :class="{ hidden: selectedEvent.description.length === 0 }" class="flex flex-col mb-4">
+              <span class="text-gray-700 font-bold mb-4">Event description</span>
+
+              <span class="text-gray-700 bg-gray-100 rounded-2xl p-4"> {{ selectedEvent.description }}</span>
+            </div>
+
+            <div v-if="selectedEvent.location?.coordinates" class="flex flex-col mb-4">
+              <span class="text-gray-700 font-bold mb-2">Location</span>
+
+              <!-- Mini map -->
+              <div class="h-48 rounded-lg overflow-hidden shadow-md">
+                <LocationMap 
+                  :coordinates="[selectedEvent.location.coordinates[1], selectedEvent.location.coordinates[0]]"
+                  :title="selectedEvent.title"
+                  :address="selectedEvent.location.address || formatCoordinates(selectedEvent.location.coordinates)"
+                />
+              </div>
             </div>
             
             <div v-if="selectedEvent.joined" class="flex items-center mb-4 text-green-600">
@@ -116,6 +127,8 @@
       <SideMap 
         :events="filteredEventsWithCoordinates"
         class="mt-4"
+        @event-selected="handleEventSelected"
+        @delete-event="deleteSelectedEvent"
       />
     </div>
     
@@ -130,8 +143,9 @@
 import SideCal from '../components/SideCal.vue';
 import SideMap from '../components/SideMap.vue';
 import Search from '../components/Search.vue';
+import LocationMap from '../components/LocationMap.vue';
 import axios from 'axios';
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, hydrateOnIdle } from 'vue';
 
 
 const events = ref([]);
@@ -180,6 +194,15 @@ const filteredEventsWithCoordinates = computed(() => {
   console.log("Events with coordinates:", filtered);
   return filtered;
 });
+
+const formatCoordinates = (coordinates) => {
+  if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
+    return 'Location unavailable';
+  }
+  
+  // Format as latitude, longitude with 6 decimal places
+  return `${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`;
+};
 
 const privateEvents = computed(() => {
   return events.value.filter(event => 
@@ -280,6 +303,10 @@ const formatDate = (dateString) => {
 // Handle newly created event
 const handleEventCreated = (newEvent) => {
   events.value.push(newEvent);
+};
+
+const handleEventSelected = (event) => {
+  selectedEvent.value = event;
 };
 </script>
 
