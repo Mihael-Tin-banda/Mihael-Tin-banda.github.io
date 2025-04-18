@@ -82,6 +82,74 @@
                 placeholder="Enter event description"
               ></textarea>
             </div>
+
+            <!-- ODABIR LOKACIJE -->
+
+            <div class="mb-4">
+              <label class="block text-gray-700 text-sm font-bold mb-2">
+                Location
+              </label>
+
+              <div v-if="!showMapPicker" class="flex items-center">
+                <input 
+                  v-model="newEvent.location" 
+                  class="shadow appearance-none border rounded flex-grow py-2 px-3 mr-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                  type="text" 
+                  placeholder="Enter event location address"
+                  required
+                >
+                <button 
+                  type="button"
+                  @click="openMapPicker" 
+                  class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Pick on Map
+                </button>
+              </div>
+
+              <!-- Map Picker Modal -->
+              <div v-if="showMapPicker" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+                  <div class="flex justify-between items-center border-b p-4">
+                    <h3 class="text-lg font-semibold">Select Location on Map</h3>
+                    <button @click="showMapPicker = false" class="text-gray-500 hover:text-gray-700">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Use MapPicker component -->
+                  <div class="p-4">
+                    <MapPicker ref="mapPickerRef" @location-selected="handleLocationSelected" />
+                  </div>
+
+                  <div class="border-t p-4 flex justify-end">
+                    <button 
+                      type="button"
+                      @click="showMapPicker = false" 
+                      class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300 mr-2"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="button"
+                      @click="confirmLocation" 
+                      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300"
+                      :disabled="mapPickerRef ? !mapPickerRef.selectedLocation : true"
+                    >
+                      Confirm Location
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ODABIR DATUMA -->
             
             <div class="mb-4">
               <label class="block text-gray-700 text-sm font-bold mb-2" for="event-start-date">
@@ -212,7 +280,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import MapPicker from './MapPicker.vue';
+import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 // Uncomment this import since you have the auth utilities
 import { isAuthenticated as checkAuth, parseJwt } from '../utils/auth';
@@ -234,7 +303,112 @@ const newEvent = ref({
   start: '',
   end: '',
   class: 'bg-purple-300',
-  type: 'private'
+  type: 'private',
+  latitude: '',
+  longitude: '',
+  address: ''
+});
+
+const showMapPicker = ref(false);
+const mapPickerRef = ref(null);
+const selectedLocation = ref(null);
+
+const handleLocationSelected = ({ coordinates, address }) => {
+  // Set the location in the form
+  newEvent.value.location = address;
+  
+  // Store the GeoJSON formatted location
+  selectedLocation.value = {
+    type: "Point",
+    coordinates: [coordinates[1], coordinates[0]], // [longitude, latitude] for GeoJSON
+    address: address
+  };
+  
+  // Close the map picker
+  showMapPicker.value = false;
+  
+  // Debug
+  console.log("Location selected:", coordinates, address);
+};
+
+// Add this function near your validateDates function in the <script setup> section
+const validateCoordinates = () => {
+  // If we have a selected location from the map, it's valid
+  if (selectedLocation.value) {
+    return true;
+  }
+  
+  // If we have a text location but no coordinates, we'll try geocoding in submitEvent
+  if (newEvent.value.location) {
+    return true;
+  }
+  
+  // If individual lat/lng were provided (legacy code), validate them
+  if (!newEvent.value.latitude && !newEvent.value.longitude) {
+    return true;  // Both empty is fine (location is optional)
+  }
+  
+  // Parse the values to check if they're valid numbers
+  const lat = parseFloat(newEvent.value.latitude);
+  const lng = parseFloat(newEvent.value.longitude);
+  
+  if (isNaN(lat) || isNaN(lng)) {
+    apiError.value = 'Coordinates must be valid numbers';
+    return false;
+  }
+  
+  // Check if values are in valid ranges
+  if (lat < -90 || lat > 90) {
+    apiError.value = 'Latitude must be between -90 and 90';
+    return false;
+  }
+  
+  if (lng < -180 || lng > 180) {
+    apiError.value = 'Longitude must be between -180 and 180';
+    return false;
+  }
+  
+  return true;
+};
+
+const confirmLocation = () => {
+  if (mapPickerRef.value) {
+    console.log("Confirming location, ref exists");
+    
+    if (mapPickerRef.value.selectedLocation && mapPickerRef.value.selectedAddress) {
+      // Directly access the MapPicker's selected location and address
+      handleLocationSelected({
+        coordinates: mapPickerRef.value.selectedLocation,
+        address: mapPickerRef.value.selectedAddress
+      });
+      return true;
+    } else {
+      console.warn("No location selected in map picker");
+      alert('Please select a location on the map first by clicking on it');
+      return false;
+    }
+  } else {
+    console.error("Map picker reference not available");
+    return false;
+  }
+};
+
+const openMapPicker = () => {
+  showMapPicker.value = true;
+  
+  // If they've typed an address, search for it when the map opens
+  nextTick(() => {
+    if (mapPickerRef.value && newEvent.value.location) {
+      mapPickerRef.value.searchQuery = newEvent.value.location;
+      // Use optional chaining to avoid errors if searchLocation doesn't exist
+      mapPickerRef.value.searchLocation?.();
+    }
+  });
+};
+
+defineExpose({
+  confirmLocation,
+  searchQuery 
 });
 
 const emit = defineEmits(['search', 'eventCreated']);
@@ -282,16 +456,16 @@ const openCreateEventModal = () => {
   // Reset any previous errors
   apiError.value = null;
   
-  // Check if user is authenticated using your utility
-  if (!checkAuth()) {
+  // Check if user is authenticated
+  if (!isAuthenticated.value) {
     alert('Please log in to create events');
     return;
   }
-
+  
   // Set default start and end times
   const now = new Date();
   const startDate = new Date(now);
-  startDate.setMinutes(Math.ceil(now.getMinutes() / 15) * 15); // Round to nearest 15 min
+  startDate.setMinutes(Math.ceil(now.getMinutes() / 15) * 15);
   
   const endDate = new Date(startDate);
   endDate.setHours(endDate.getHours() + 1);
@@ -313,7 +487,10 @@ const openCreateEventModal = () => {
     start: formatForInput(startDate),
     end: formatForInput(endDate),
     class: 'bg-purple-300',
-    type: 'private' // Default to private
+    type: 'private',
+    latitude: '',
+    longitude: '',
+    address: ''
   };
   
   showCreateModal.value = true;
@@ -344,19 +521,12 @@ const submitEvent = async () => {
   apiError.value = null;
   
   try {
-    // Format dates exactly as required by your API
+    // Format dates for API
     const formatDateForApi = (dateString) => {
-      const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      
-      // Use exactly this format as expected by your backend
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
+      return new Date(dateString).toISOString();
     };
     
+    // Create the basic event data
     const eventData = {
       title: newEvent.value.title,
       description: newEvent.value.description || "",
@@ -364,55 +534,84 @@ const submitEvent = async () => {
       end: formatDateForApi(newEvent.value.end),
       class: newEvent.value.class,
       type: newEvent.value.type
-      // author will be extracted from JWT on the backend
     };
     
-    console.log('Sending event data:', eventData);
-    
-    const token = localStorage.getItem('token');
-    const response = await axios.post(
-      'https://eventium-backend.onrender.com/events', 
-      eventData,
-      { 
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        } 
+    // Add location data if we have it from the map picker
+    if (selectedLocation.value) {
+      // Use the selectedLocation object directly since it's already formatted correctly
+      eventData.location = selectedLocation.value;
+      console.log('Using selected location:', selectedLocation.value);
+    }
+    // If we don't have location data but have an address, try to geocode it
+    else if (newEvent.value.location) {
+      try {
+        console.log('Geocoding address:', newEvent.value.location);
+        const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+          params: {
+            q: newEvent.value.location,
+            format: 'json',
+            limit: 1
+          }
+        });
+        
+        if (response.data && response.data.length > 0) {
+          const result = response.data[0];
+          eventData.location = {
+            type: "Point",
+            coordinates: [parseFloat(result.lon), parseFloat(result.lat)],
+            address: newEvent.value.location
+          };
+          console.log('Geocoded location:', eventData.location);
+        }
+      } catch (error) {
+        console.error('Error geocoding address:', error);
+        // Continue without location if geocoding fails
       }
-    );
+    }
     
-    console.log('API response:', response.data);
+    console.log('Sending event data:', JSON.stringify(eventData, null, 2));
+    
+    // Use the fetch API like in the test function for consistency
+    const token = localStorage.getItem('token');
+    const response = await fetch('https://eventium-backend.onrender.com/events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(eventData)
+    });
+    
+    // Check if request was successful
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+    
+    // Parse the response
+    const result = await response.json();
+    console.log('Event created successfully:', result);
+    
+    // Check if location was included in the response
+    if (result.event && result.event.location) {
+      console.log('✅ Location data was properly saved!', result.event.location);
+    } else {
+      console.warn('⚠️ Location data might not have been saved correctly.');
+    }
     
     // Emit event with the newly created event data
-    emit('eventCreated', response.data.event);
+    emit('eventCreated', result.event);
     
+    // Close the modal and show success message
     closeCreateModal();
-    
-    // Show success message
     alert('Event created successfully!');
+    
   } catch (error) {
     console.error('Error creating event:', error);
     
-    // Log detailed error information for debugging
-    if (error.response) {
-      console.error('Server responded with:', {
-        status: error.response.status,
-        data: error.response.data
-      });
-      
-      // Handle validation errors
-      if (error.response?.data?.errors && error.response.data.errors.length > 0) {
-        // Handle express-validator errors
-        apiError.value = error.response.data.errors.map(err => err.msg).join(', ');
-      } else if (error.response?.data?.message) {
-        apiError.value = error.response.data.message;
-      } else if (error.response?.data) {
-        apiError.value = typeof error.response.data === 'string' 
-          ? error.response.data 
-          : JSON.stringify(error.response.data);
-      } else {
-        apiError.value = `Server error (${error.response.status})`;
-      }
+    // Handle error responses
+    if (error.message) {
+      apiError.value = error.message;
     } else {
       apiError.value = 'Failed to create event. Please try again.';
     }
@@ -423,4 +622,25 @@ const submitEvent = async () => {
 </script>
 
 <style scoped>
+@import 'leaflet/dist/leaflet.css';
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-control-geosearch {
+  width: 100%;
+  max-width: 400px;
+  margin: 10px;
+}
+
+.leaflet-control-geosearch form {
+  display: flex;
+}
+
+.leaflet-control-geosearch input {
+  flex-grow: 1;
+  padding: 8px;
+}
 </style>

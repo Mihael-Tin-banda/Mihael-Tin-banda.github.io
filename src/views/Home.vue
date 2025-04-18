@@ -108,28 +108,32 @@
       </div>
     </div>
     
-    <!-- KALENDAR -->
-
-    <!-- TABLET> -->
-    <div class="hidden lg:block lg:overflow-y-auto max-h-screen pr-1">
+    <!-- SIDEBAR COMPONENTS -->
+    <!-- Desktop Layout -->
+    <div class="hidden lg:block lg:overflow-y-auto max-h-screen">
       <SideCal />
+      
+      <SideMap 
+        v-if="isAuthenticated && filteredEventsWithCoordinates.length > 0"
+        :events="filteredEventsWithCoordinates"
+        class="py-4"
+      />
     </div>
     
-    <!-- MOBITEL -->
+    <!-- Mobile Layout -->
     <div class="lg:hidden mt-4">
       <SideCal />
     </div>
-
-    <!-- KARTA -->
-
   </div>
 </template>
 
 <script setup>
 import SideCal from '../components/SideCal.vue';
+import SideMap from '../components/SideMap.vue';
 import Search from '../components/Search.vue';
 import axios from 'axios';
 import { onMounted, ref, computed } from 'vue';
+
 
 const events = ref([]);
 const selectedEvent = ref(null);
@@ -149,6 +153,33 @@ const filteredEvents = computed(() => {
   return privateEvents.value.filter(event => 
     event.title.toLowerCase().includes(query)
   );
+});
+
+const filteredEventsWithCoordinates = computed(() => {
+  console.log("Events before filtering:", filteredEvents.value);
+  const filtered = filteredEvents.value.filter(event => {
+    // Check if event has valid coordinates (latitude and longitude)
+    const hasCoordinates = event.location?.coordinates && 
+           Array.isArray(event.location.coordinates) && 
+           event.location.coordinates.length === 2;
+    
+    if (!hasCoordinates) {
+      console.log("Event missing coordinates:", event.title);
+    }
+    return hasCoordinates;
+  }).map(event => {
+    // Format the event data for the map component
+    return {
+      ...event,
+      coordinates: [
+        event.location.coordinates[1], // latitude
+        event.location.coordinates[0]  // longitude
+      ]
+    };
+  });
+  
+  console.log("Events with coordinates:", filtered);
+  return filtered;
 });
 
 const privateEvents = computed(() => {
