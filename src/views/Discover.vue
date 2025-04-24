@@ -1,59 +1,100 @@
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen overflow-hidden">
     
-    <div class="lg:col-span-3 overflow-y-auto pr-2 pb-20 max-h-screen">
-      <div class="p-3">
-        <h1 class="font-bold text-5xl md:text-7xl text-gray-800 mb-8">Discover</h1>
+    <div class="lg:col-span-3 flex flex-col max-h-screen overflow-hidden">
+      <!-- Fixed header section -->
+      <div class="flex-none p-3">
+        <h1 class="font-bold text-4xl md:text-5xl text-gray-800 mb-6">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Discover</span>
+        </h1>
 
-        <!-- Use the Search component with event creation functionality -->
+        <!-- Search component with enhanced styling -->
         <Search 
           @search="updateSearch" 
           @event-created="handleEventCreated" 
+          class="mb-8"
         />
-        
+      </div>
+      
+      <!-- Scrollable events section -->
+      <div class="flex-grow overflow-y-auto pr-2 pb-20">
         <!-- Loading indicator -->
-        <div v-if="loading" class="text-center py-12">
+        <div v-if="loading" class="text-center py-12 bg-white rounded-xl shadow-md p-8">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto"></div>
           <p class="text-gray-500 mt-4">Loading events...</p>
         </div>
         
-        <div v-else-if="filteredEvents.length === 0" class="text-center py-12">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p class="text-gray-500 mt-4 text-lg">No public events found matching "{{ searchQuery }}"</p>
+        <div v-else-if="filteredEvents.length === 0" class="bg-white rounded-xl shadow-md p-8 text-center">
+          <div class="bg-gray-100 p-4 inline-block rounded-full mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-700 mb-3">No Events Found</h2>
+          <p class="text-gray-500 max-w-md mx-auto">
+            No public events found matching "{{ searchQuery }}"
+          </p>
         </div>
-      </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <div v-for="event in filteredEvents" :key="event._id" class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-          <div class="p-4">
-            <div class="flex items-center mb-3">
-              <span class="w-3 h-3 rounded-full mr-2" :class="event.class"></span>
-              <h2 class="text-lg font-medium text-gray-900">{{ event.title }}</h2>
-            </div>
-            <p class="text-sm text-gray-500">Start: {{ formatDate(event.start) }}</p>
-            <p class="text-sm text-gray-500 mb-2">End: {{ formatDate(event.end) }}</p>
-            <p v-if="event.authorName" class="text-xs text-gray-400 mb-3">
-              <span class="inline-flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-3">
+          <div v-for="event in filteredEvents" :key="event._id" class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden">
+            <!-- Event card content remains unchanged -->
+            <div class="h-2" :class="event.class"></div>
+            <div class="p-5">
+              <div class="flex items-center mb-3">
+                <span class="w-3 h-3 rounded-full mr-2" :class="event.class"></span>
+                <h2 class="text-lg font-medium text-gray-900 truncate">{{ event.title }}</h2>
+              </div>
+              
+              <!-- Rest of your event card content -->
+              <div class="mb-3 flex items-center text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                {{ event.authorName }}
-              </span>
-            </p>
-            <div class="flex justify-end space-x-2">
-              <button 
-                v-if="isAuthenticated && !hasJoinedEvent(event._id)"
-                @click="joinEvent(event)" 
-                class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm rounded-md transition duration-300">
-                Join
-              </button>
-              <button 
-                @click="openEventDetails(event)" 
-                class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 text-sm rounded-md transition duration-300">
-                View Details
-              </button>
+                <span>{{ formatDate(event.start) }}</span>
+              </div>
+              
+              <div class="mb-4 flex items-center text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ formatDate(event.end) }}</span>
+              </div>
+              
+              <div class="flex items-center mb-4">
+                <div class="flex items-center flex-grow">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span class="text-xs text-gray-400 truncate">{{ event.authorName || 'Anonymous' }}</span>
+                </div>
+                
+                <div v-if="hasJoinedEvent(event._id)" class="flex items-center ml-2">
+                  <span class="bg-green-100 text-green-600 text-xs px-2 py-1 rounded-full">Joined</span>
+                </div>
+              </div>
+              
+              <div class="flex justify-end space-x-2">
+                <button 
+                  v-if="isAuthenticated && !hasJoinedEvent(event._id)"
+                  @click="joinEvent(event)" 
+                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm rounded-lg transition duration-300 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Join
+                </button>
+                <button 
+                  @click="openEventDetails(event)" 
+                  class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-sm rounded-lg transition duration-300 flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Details
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -62,7 +103,8 @@
 
     <!-- Event Details Modal -->
     <div v-if="selectedEvent" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-auto">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto overflow-hidden">
+        <div class="h-2" :class="selectedEvent.class"></div>
         <div class="p-6">
           <div class="flex justify-between items-start">
             <div class="flex items-center">
@@ -85,14 +127,16 @@
             </div>
             <div class="flex items-center mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span class="text-gray-700">End: {{ formatDate(selectedEvent.end) }}</span>
             </div>
             
             <div :class="{ hidden: selectedEvent.description?.length === 0 }" class="flex flex-col mb-4">
-              <span class="text-gray-700 font-bold mb-4">Event description</span>
-              <span class="text-gray-700 bg-gray-100 rounded-2xl p-4">{{ selectedEvent.description }}</span>
+              <span class="text-gray-700 font-bold mb-2">Description</span>
+              <div class="text-gray-700 bg-gray-50 rounded-lg border border-gray-100 p-4">
+                {{ selectedEvent.description }}
+              </div>
             </div>
 
             <div v-if="selectedEvent.location?.coordinates" class="flex flex-col mb-4">
@@ -107,18 +151,18 @@
               </div>
             </div>
             
-            <div v-if="selectedEvent.authorName" class="flex items-center mb-4">
+            <div v-if="selectedEvent.authorName" class="flex items-center mb-4 p-3 bg-gray-50 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               <span class="text-gray-700">Created by: {{ selectedEvent.authorName }}</span>
             </div>
             
-            <div v-if="hasJoinedEvent(selectedEvent._id)" class="flex items-center mb-4 text-green-600">
+            <div v-if="hasJoinedEvent(selectedEvent._id)" class="flex items-center p-3 mb-4 bg-green-50 rounded-lg border border-green-100 text-green-700">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Joined event</span>
+              <span>You've joined this event</span>
             </div>
           </div>
           
@@ -126,19 +170,28 @@
             <button 
               v-if="isAuthenticated && !hasJoinedEvent(selectedEvent._id) && selectedEvent.type === 'public'"
               @click="joinEvent(selectedEvent)" 
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-300">
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300 flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
               Join Event
             </button>
             <button 
               @click="closeModal" 
-              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300">
+              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300"
+            >
               Close
             </button>
             <button 
               v-if="canDeleteEvent(selectedEvent)"
               @click="deleteSelectedEvent" 
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition duration-300">
-              Delete Event
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-300 flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete
             </button>
           </div>
         </div>
@@ -147,60 +200,80 @@
 
     <!-- Join Confirmation Modal -->
     <div v-if="joiningEvent" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-auto p-6">
-        <div v-if="joinLoading" class="text-center py-8">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
-          <p class="text-gray-700 mt-4">Joining event...</p>
-        </div>
-        
-        <div v-else-if="joinError" class="text-center py-8">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p class="text-red-600 mt-4">{{ joinError }}</p>
-          <button 
-            @click="cancelJoin" 
-            class="mt-4 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300">
-            Close
-          </button>
-        </div>
-        
-        <div v-else-if="joinSuccess" class="text-center py-8">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <p class="text-green-600 mt-4">Successfully joined the event!</p>
-          <button 
-            @click="finishJoin" 
-            class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300">
-            Done
-          </button>
-        </div>
-        
-        <div v-else>
-          <h3 class="text-xl font-bold text-gray-800 mb-4">Join this event?</h3>
-          <p class="text-gray-600 mb-6">
-            You're about to join "{{ joiningEvent.title }}". This will add it to your personal calendar.
-          </p>
-          <div class="flex justify-end space-x-3">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto overflow-hidden">
+        <div class="h-2 bg-green-500"></div>
+        <div class="p-6">
+          <div v-if="joinLoading" class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
+            <p class="text-gray-700 mt-4">Joining event...</p>
+          </div>
+          
+          <div v-else-if="joinError" class="text-center py-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-red-600 mt-4">{{ joinError }}</p>
             <button 
               @click="cancelJoin" 
-              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300">
-              Cancel
+              class="mt-4 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300">
+              Close
             </button>
+          </div>
+          
+          <div v-else-if="joinSuccess" class="text-center py-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <p class="text-green-600 mt-4 text-xl font-medium">Successfully joined!</p>
+            <p class="text-gray-500 mt-2">The event has been added to your calendar</p>
             <button 
-              @click="confirmJoin" 
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-300">
-              Join Event
+              @click="finishJoin" 
+              class="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition duration-300 font-medium">
+              Done
             </button>
+          </div>
+          
+          <div v-else>
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Join this event?</h3>
+            <p class="text-gray-600 mb-6">
+              You're about to join "<span class="font-medium">{{ joiningEvent.title }}</span>". 
+              This will add it to your personal calendar.
+            </p>
+            <div class="flex justify-end space-x-3">
+              <button 
+                @click="cancelJoin" 
+                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300">
+                Cancel
+              </button>
+              <button 
+                @click="confirmJoin" 
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Join Event
+              </button>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- SIDEBAR COMPONENTS (Similar to Home view) -->
+    <div class="hidden lg:block lg:col-span-1 lg:overflow-y-auto max-h-screen z-0">
+      <EventFilter
+        v-model:dateFilter="dateFilter"
+        v-model:selectedCategories="selectedCategories"
+        v-model:locationFilter="locationFilter"
+        @filter-changed="applyFilters"
+      />
+
     </div>
   </div>
 </template>
 
 <script setup>
+import EventFilter from '../components/EventFilter.vue';
 import Search from '../components/Search.vue';
 import LocationMap from '../components/LocationMap.vue';
 import axios from 'axios';
@@ -213,6 +286,10 @@ const searchQuery = ref('');
 const loading = ref(true);
 const joinedEvents = ref([]);
 
+const dateFilter = ref('all');
+const selectedCategories = ref([]);
+const locationFilter = ref('');
+
 // User authentication state
 const userToken = ref('');
 const userId = ref('');
@@ -223,19 +300,83 @@ const joinLoading = ref(false);
 const joinError = ref(null);
 const joinSuccess = ref(false);
 
-// Computed property for filtered events
-const filteredEvents = computed(() => {
-  if (!searchQuery.value.trim()) return publicEvents.value;
-  
-  const query = searchQuery.value.toLowerCase().trim();
-  return publicEvents.value.filter(event => 
-    event.title.toLowerCase().includes(query)
-  );
-});
-
+// Computed property for public events
 const publicEvents = computed(() => {
   return events.value.filter(event => event.type === "public");
 });
+
+// Computed property for filtered events - COMBINED VERSION
+const filteredEvents = computed(() => {
+  let filtered = publicEvents.value;
+  
+  // Apply search query filtering
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim();
+    filtered = filtered.filter(event => 
+      event.title.toLowerCase().includes(query)
+    );
+  }
+  
+  // Apply date filtering
+  if (dateFilter.value !== 'all') {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+    
+    const nextMonth = new Date(today);
+    nextMonth.setMonth(today.getMonth() + 1);
+    
+    filtered = filtered.filter(event => {
+      const eventDate = new Date(event.start);
+      
+      switch (dateFilter.value) {
+        case 'today':
+          return eventDate >= today && eventDate < tomorrow;
+        case 'tomorrow':
+          return eventDate >= tomorrow && eventDate < new Date(tomorrow.getTime() + 24*60*60*1000);
+        case 'week':
+          return eventDate >= today && eventDate < nextWeek;
+        case 'month':
+          return eventDate >= today && eventDate < nextMonth;
+        default:
+          return true;
+      }
+    });
+  }
+  
+  // Apply category filtering
+  if (selectedCategories.value.length > 0) {
+    filtered = filtered.filter(event => 
+      event.category && selectedCategories.value.includes(event.category)
+    );
+  }
+  
+  // Apply location filtering
+  if (locationFilter.value.trim()) {
+    const location = locationFilter.value.toLowerCase().trim();
+    filtered = filtered.filter(event => 
+      (event.location?.address && event.location.address.toLowerCase().includes(location)) ||
+      (event.locationName && event.locationName.toLowerCase().includes(location))
+    );
+  }
+  
+  return filtered;
+});
+
+// Add a method to handle filter changes
+const applyFilters = () => {
+  console.log('Filters applied:', {
+    date: dateFilter.value,
+    categories: selectedCategories.value,
+    location: locationFilter.value
+  });
+};
+
+// Rest of your code remains unchanged
 
 onMounted(async () => {
   // Check if user is authenticated

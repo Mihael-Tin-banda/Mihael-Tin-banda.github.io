@@ -1,10 +1,14 @@
 <template>
-  <div class="min-h-screen h-screen w-screen p-2 sm:p-4 box-border">
-    <div class="rounded-2xl bg-gray-200 flex flex-col sm:flex-row h-full overflow-hidden">
+  <div class="min-h-screen h-screen w-screen p-1 sm:p-3 md:p-4 box-border bg-gray-100">
+    <div class="rounded-2xl bg-white shadow-lg flex flex-col sm:flex-row h-full overflow-hidden border border-gray-200">
+      <!-- Navigation sidebar -->
       <Nav v-if="isAuthenticated" class="z-50" />
 
-      <div class="flex-1 overflow-hidden">
-        <RouterView />
+      <!-- Main content area -->
+      <div class="flex-1 overflow-hidden relative">
+        <div class="h-full">
+          <RouterView />
+        </div>
       </div>
     </div>
   </div>

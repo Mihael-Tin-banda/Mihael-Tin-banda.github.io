@@ -499,6 +499,25 @@ const openCreateEventModal = () => {
 const closeCreateModal = () => {
   showCreateModal.value = false;
   apiError.value = null;
+  
+  // Reset form state and clear any selections
+  newEvent.value = {
+    title: '',
+    description: '',
+    start: '',
+    end: '',
+    class: 'bg-purple-300',
+    type: 'private',
+    location: '',
+    latitude: '',
+    longitude: '',
+    address: ''
+  };
+  
+  // Reset other related state
+  selectedLocation.value = null;
+  showMapPicker.value = false;
+  isSubmitting.value = false;
 };
 
 // Create a new event with improved error handling
@@ -592,19 +611,14 @@ const submitEvent = async () => {
     const result = await response.json();
     console.log('Event created successfully:', result);
     
-    // Check if location was included in the response
-    if (result.event && result.event.location) {
-      console.log('✅ Location data was properly saved!', result.event.location);
-    } else {
-      console.warn('⚠️ Location data might not have been saved correctly.');
-    }
-    
     // Emit event with the newly created event data
     emit('eventCreated', result.event);
     
-    // Close the modal and show success message
+    // Success - explicitly reset state before closing modal
+    isSubmitting.value = false;
+    
+    // Call closeCreateModal to properly reset and close the modal
     closeCreateModal();
-    alert('Event created successfully!');
     
   } catch (error) {
     console.error('Error creating event:', error);
@@ -615,7 +629,8 @@ const submitEvent = async () => {
     } else {
       apiError.value = 'Failed to create event. Please try again.';
     }
-  } finally {
+    
+    // Make sure to set isSubmitting to false even if there's an error
     isSubmitting.value = false;
   }
 };

@@ -1,59 +1,95 @@
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen overflow-hidden">
     
-    <div class="lg:col-span-3 overflow-y-auto pr-2 pb-20 max-h-screen">
-      <div class="p-3">
-        <h1 class="font-bold text-5xl md:text-7xl text-gray-800 mb-8">Home</h1>
+    <div class="lg:col-span-3 flex flex-col max-h-screen overflow-hidden">
+      <!-- Fixed header section -->
+      <div class="flex-none p-3">
+        <h1 class="font-bold text-4xl md:text-5xl text-gray-800 mb-6">
+          <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Home</span>
+        </h1>
 
         <Search 
           @search="updateSearch" 
           @event-created="handleEventCreated" 
+          class="mb-8"
         />
-        
+      </div>
+      
+      <!-- Scrollable events section -->
+      <div class="flex-grow overflow-y-auto pr-2 pb-20">
         <!-- Loading indicator -->
-        <div v-if="loading" class="text-center py-12">
+        <div v-if="loading" class="text-center py-12 bg-white rounded-xl shadow-md p-8">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto"></div>
           <p class="text-gray-500 mt-4">Loading events...</p>
         </div>
         
-        <div v-else-if="!isAuthenticated" class="text-center py-12">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <p class="text-gray-500 mt-4 text-lg">Please log in to view your personal events</p>
+        <div v-else-if="!isAuthenticated" class="bg-white rounded-xl shadow-md p-8 text-center">
+          <div class="bg-gray-100 p-4 inline-block rounded-full mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-700 mb-3">Authentication Required</h2>
+          <p class="text-gray-500 mb-8 max-w-md mx-auto">Please log in to view your personal events</p>
         </div>
         
-        <div v-else-if="filteredEvents.length === 0" class="text-center py-12">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p class="text-gray-500 mt-4 text-lg">No events found matching "{{ searchQuery }}"</p>
+        <div v-else-if="filteredEvents.length === 0" class="bg-white rounded-xl shadow-md p-8 text-center">
+          <div class="bg-gray-100 p-4 inline-block rounded-full mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-700 mb-3">No Events Found</h2>
+          <p class="text-gray-500 max-w-md mx-auto">
+            No events found matching "{{ searchQuery }}"
+          </p>
         </div>
-      </div>
 
-      <div v-if="isAuthenticated && filteredEvents.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <div v-for="event in filteredEvents" :key="event._id" class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-          <div class="p-4">
-            <div class="flex items-center mb-3">
-              <span class="w-3 h-3 rounded-full mr-2" :class="event.class"></span>
-              <h2 class="text-lg font-medium text-gray-900">{{ event.title }}</h2>
-            </div>
-            <p class="text-sm text-gray-500">Start: {{ formatDate(event.start) }}</p>
-            <p class="text-sm text-gray-500 mb-3">End: {{ formatDate(event.end) }}</p>
-            <div class="flex justify-end">
-              <button 
-                @click="openEventDetails(event)" 
-                class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 text-sm rounded-md transition duration-300">
-                View Details
-              </button>
+        <div v-if="isAuthenticated && filteredEvents.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-3">
+          <div v-for="event in filteredEvents" :key="event._id" class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden">
+            <div class="h-2" :class="event.class"></div>
+            <div class="p-5">
+              <div class="flex items-center mb-3">
+                <span class="w-3 h-3 rounded-full mr-2" :class="event.class"></span>
+                <h2 class="text-lg font-medium text-gray-900 truncate">{{ event.title }}</h2>
+              </div>
+              
+              <div class="mb-3 flex items-center text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>{{ formatDate(event.start) }}</span>
+              </div>
+              
+              <div class="mb-4 flex items-center text-sm text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{{ formatDate(event.end) }}</span>
+              </div>
+              
+              <div class="flex justify-end">
+                <button 
+                  @click="openEventDetails(event)" 
+                  class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-sm rounded-lg transition duration-300 flex items-center"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  View Details
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Event Details Modal -->
     <div v-if="selectedEvent" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-auto">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto overflow-hidden">
+        <div class="h-2" :class="selectedEvent.class"></div>
         <div class="p-6">
           <div class="flex justify-between items-start">
             <div class="flex items-center">
@@ -76,20 +112,20 @@
             </div>
             <div class="flex items-center mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span class="text-gray-700">End: {{ formatDate(selectedEvent.end) }}</span>
             </div>
             
-            <div :class="{ hidden: selectedEvent.description.length === 0 }" class="flex flex-col mb-4">
-              <span class="text-gray-700 font-bold mb-4">Event description</span>
-
-              <span class="text-gray-700 bg-gray-100 rounded-2xl p-4"> {{ selectedEvent.description }}</span>
+            <div :class="{ hidden: selectedEvent.description?.length === 0 }" class="flex flex-col mb-4">
+              <span class="text-gray-700 font-bold mb-2">Description</span>
+              <div class="text-gray-700 bg-gray-50 rounded-lg border border-gray-100 p-4">
+                {{ selectedEvent.description }}
+              </div>
             </div>
 
             <div v-if="selectedEvent.location?.coordinates" class="flex flex-col mb-4">
               <span class="text-gray-700 font-bold mb-2">Location</span>
-
               <!-- Mini map -->
               <div class="h-48 rounded-lg overflow-hidden shadow-md">
                 <LocationMap 
@@ -100,18 +136,28 @@
               </div>
             </div>
             
-            <div v-if="selectedEvent.joined" class="flex items-center mb-4 text-green-600">
+            <div v-if="selectedEvent.joined" class="flex items-center p-3 mb-4 bg-green-50 rounded-lg border border-green-100 text-green-700">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Joined event</span>
+              <span>You've joined this event</span>
             </div>
           </div>
           
           <div class="mt-6 flex justify-end space-x-3">
             <button 
+              @click="closeModal" 
+              class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition duration-300"
+            >
+              Close
+            </button>
+            <button 
               @click="deleteSelectedEvent" 
-              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition duration-300">
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-300 flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
               Delete Event
             </button>
           </div>
@@ -122,19 +168,24 @@
     <!-- SIDEBAR COMPONENTS -->
     <!-- Desktop Layout -->
     <div class="hidden lg:block lg:overflow-y-auto max-h-screen z-0">
-      <SideCal />
+      <div class="bg-white rounded-xl shadow-md overflow-hidden mb-4">
+        <SideCal />
+      </div>
       
-      <SideMap 
-        :events="filteredEventsWithCoordinates"
-        class="mt-4"
-        @event-selected="handleEventSelected"
-        @delete-event="deleteSelectedEvent"
-      />
+      <div class="bg-white rounded-xl shadow-md overflow-hidden mb-4">
+        <SideMap 
+          :events="filteredEventsWithCoordinates"
+          @event-selected="handleEventSelected"
+          @delete-event="deleteSelectedEvent"
+        />
+      </div>
     </div>
     
     <!-- Mobile Layout -->
     <div class="lg:hidden mt-4">
-      <SideCal />
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <SideCal />
+      </div>
     </div>
   </div>
 </template>
