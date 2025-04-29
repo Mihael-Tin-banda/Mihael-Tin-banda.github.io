@@ -46,6 +46,24 @@
                 <h2 class="text-lg font-medium text-gray-900 truncate">{{ event.title }}</h2>
               </div>
               
+              <!-- Add Category Badge -->
+              <div v-if="event.category" class="mb-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" 
+                  :class="{
+                    'bg-blue-100 text-blue-800': event.category === 'business',
+                    'bg-green-100 text-green-800': event.category === 'education',
+                    'bg-purple-100 text-purple-800': event.category === 'social',
+                    'bg-red-100 text-red-800': event.category === 'sports',
+                    'bg-yellow-100 text-yellow-800': event.category === 'entertainment',
+                    'bg-gray-100 text-gray-800': event.category === 'other' || !event.category
+                  }">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  {{ formatCategoryName(event.category) }}
+                </span>
+              </div>
+              
               <!-- Rest of your event card content -->
               <div class="mb-3 flex items-center text-sm text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,6 +148,24 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span class="text-gray-700">End: {{ formatDate(selectedEvent.end) }}</span>
+            </div>
+            
+            <!-- Add Category Badge to Event Details Modal -->
+            <div v-if="selectedEvent.category" class="mb-3">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" 
+                :class="{
+                  'bg-blue-100 text-blue-800': selectedEvent.category === 'business',
+                  'bg-green-100 text-green-800': selectedEvent.category === 'education',
+                  'bg-purple-100 text-purple-800': selectedEvent.category === 'social',
+                  'bg-red-100 text-red-800': selectedEvent.category === 'sports',
+                  'bg-yellow-100 text-yellow-800': selectedEvent.category === 'entertainment',
+                  'bg-gray-100 text-gray-800': selectedEvent.category === 'other' || !selectedEvent.category
+                }">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                {{ formatCategoryName(selectedEvent.category) }}
+              </span>
             </div>
             
             <div :class="{ hidden: selectedEvent.description?.length === 0 }" class="flex flex-col mb-4">
@@ -554,6 +590,12 @@ const formatCoordinates = (coordinates) => {
   
   // Format as latitude, longitude with 6 decimal places
   return `${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`;
+};
+
+// Add the formatCategoryName function if it doesn't exist
+const formatCategoryName = (category) => {
+  if (!category) return 'Other';
+  return category.charAt(0).toUpperCase() + category.slice(1);
 };
 </script>
 

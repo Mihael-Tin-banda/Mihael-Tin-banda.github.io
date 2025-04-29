@@ -1,5 +1,6 @@
 <template>
   <div class="mb-6">
+    <!-- Search Bar -->
     <div class="flex items-center">
       <div class="relative flex-1 mr-3">
         <input
@@ -28,7 +29,6 @@
         </button>
       </div>
       
-      <!-- Add button to create new event -->
       <button 
         @click="openCreateEventModal" 
         class="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-md transition duration-300 flex items-center"
@@ -40,52 +40,77 @@
     </div>
     
     <!-- Create Event Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-hidden">
-  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-auto max-h-[90vh] flex flex-col">
-    <div class="p-6 flex-grow overflow-y-auto">
-      <div class="flex justify-between items-start sticky top-0 bg-white pb-4 mb-4 border-b">
-        <h2 class="text-xl font-bold text-gray-800">Create Event</h2>
-        <button @click="closeCreateModal" class="text-gray-500 hover:text-gray-700">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4 overflow-hidden">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-auto max-h-[95vh] flex flex-col">
+        <div class="p-4 sm:p-6 flex-grow overflow-y-auto scrollbar-thin">
+          <div class="flex justify-between items-start bg-white pb-4 mb-4 border-b">
+            <h2 class="text-xl font-bold text-gray-800">Create Event</h2>
+            <button @click="closeCreateModal" class="text-gray-500 hover:text-gray-700">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           
-          <form @submit.prevent="submitEvent">
-            <div class="mb-4">
+          <form @submit.prevent="submitEvent" class="space-y-5">
+            <!-- Event Basic Info -->
+            <div>
               <label class="block text-gray-700 text-sm font-bold mb-2" for="event-title">
                 Event Title
               </label>
               <input 
                 v-model="newEvent.title" 
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200" 
                 id="event-title" 
-                name="event-title"
                 type="text" 
                 placeholder="Enter event title"
                 required
               >
             </div>
             
-            <!-- Added Description Field -->
-            <div class="mb-4">
+            <div>
               <label class="block text-gray-700 text-sm font-bold mb-2" for="event-description">
                 Event Description (Optional)
               </label>
               <textarea 
                 v-model="newEvent.description" 
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200" 
                 id="event-description" 
-                name="event-description"
                 rows="3"
                 placeholder="Enter event description"
               ></textarea>
             </div>
 
-            <!-- ODABIR LOKACIJE -->
+            <!-- Category Selection -->
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2" for="event-category">
+                Event Category
+              </label>
+              <div class="relative">
+                <select
+                  v-model="newEvent.category"
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200"
+                  id="event-category"
+                  required
+                >
+                  <option value="" disabled>Select a category</option>
+                  <option v-for="category in availableCategories" :key="category" :value="category">
+                    {{ formatCategoryName(category) }}
+                  </option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
+              </div>
+              <p class="mt-1 text-xs text-gray-500">
+                Select a category for your event to help others find it
+              </p>
+            </div>
 
-            <div class="mb-4">
+            <!-- Location Selection -->
+            <div>
               <label class="block text-gray-700 text-sm font-bold mb-2">
                 Location
               </label>
@@ -93,7 +118,7 @@
               <div v-if="!showMapPicker" class="flex items-center">
                 <input 
                   v-model="newEvent.location" 
-                  class="shadow appearance-none border rounded flex-grow py-2 px-3 mr-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                  class="shadow appearance-none border rounded flex-grow py-2 px-3 mr-2 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200" 
                   type="text" 
                   placeholder="Enter event location address"
                   required
@@ -101,13 +126,14 @@
                 <button 
                   type="button"
                   @click="openMapPicker" 
-                  class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300 flex items-center"
+                  class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md transition duration-300 flex items-center text-sm"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  Pick on Map
+                  <span class="hidden sm:inline">Pick on Map</span>
+                  <span class="sm:hidden">Map</span>
                 </button>
               </div>
 
@@ -123,7 +149,6 @@
                     </button>
                   </div>
 
-                  <!-- Use MapPicker component -->
                   <div class="p-4">
                     <MapPicker ref="mapPickerRef" @location-selected="handleLocationSelected" />
                   </div>
@@ -149,38 +174,37 @@
               </div>
             </div>
 
-            <!-- ODABIR DATUMA -->
-            
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2" for="event-start-date">
-                Start Date & Time
-              </label>
-              <input 
-                v-model="newEvent.start" 
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                id="event-start-date" 
-                name="event-start-date"
-                type="datetime-local" 
-                required
-              >
+            <!-- Date and Time Selection -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="event-start-date">
+                  Start Date & Time
+                </label>
+                <input 
+                  v-model="newEvent.start" 
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200" 
+                  id="event-start-date" 
+                  type="datetime-local" 
+                  required
+                >
+              </div>
+              
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="event-end-date">
+                  End Date & Time
+                </label>
+                <input 
+                  v-model="newEvent.end" 
+                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200" 
+                  id="event-end-date" 
+                  type="datetime-local" 
+                  required
+                >
+              </div>
             </div>
             
-            <div class="mb-4">
-              <label class="block text-gray-700 text-sm font-bold mb-2" for="event-end-date">
-                End Date & Time
-              </label>
-              <input 
-                v-model="newEvent.end" 
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                id="event-end-date" 
-                name="event-end-date"
-                type="datetime-local" 
-                required
-              >
-            </div>
-            
-            <!-- Event Type Toggle -->
-            <div class="mb-4">
+            <!-- Event Visibility Toggle -->
+            <div>
               <label class="block text-gray-700 text-sm font-bold mb-2">
                 Event Type
               </label>
@@ -202,77 +226,79 @@
               </p>
             </div>
             
-            <div class="mb-6">
+            <!-- Color Selection -->
+            <div>
               <fieldset>
                 <legend class="block text-gray-700 text-sm font-bold mb-2">
                   Event Color
                 </legend>
-                <div class="flex space-x-2">
+                <div class="flex flex-wrap gap-3">
                   <button 
                     type="button"
                     aria-label="Red color"
                     @click="newEvent.class = 'bg-red-300'"
-                    class="w-8 h-8 rounded-full bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    class="w-8 h-8 rounded-full bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
                     :class="{'ring-2 ring-offset-2 ring-red-500': newEvent.class === 'bg-red-300'}"
                   ></button>
                   <button 
                     type="button"
                     aria-label="Blue color"
                     @click="newEvent.class = 'bg-blue-300'"
-                    class="w-8 h-8 rounded-full bg-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    class="w-8 h-8 rounded-full bg-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
                     :class="{'ring-2 ring-offset-2 ring-blue-500': newEvent.class === 'bg-blue-300'}"
                   ></button>
                   <button 
                     type="button"
                     aria-label="Green color"
                     @click="newEvent.class = 'bg-green-300'"
-                    class="w-8 h-8 rounded-full bg-green-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    class="w-8 h-8 rounded-full bg-green-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
                     :class="{'ring-2 ring-offset-2 ring-green-500': newEvent.class === 'bg-green-300'}"
                   ></button>
                   <button 
                     type="button"
                     aria-label="Yellow color"
                     @click="newEvent.class = 'bg-yellow-300'"
-                    class="w-8 h-8 rounded-full bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+                    class="w-8 h-8 rounded-full bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all duration-200"
                     :class="{'ring-2 ring-offset-2 ring-yellow-500': newEvent.class === 'bg-yellow-300'}"
                   ></button>
                   <button 
                     type="button"
                     aria-label="Purple color"
                     @click="newEvent.class = 'bg-purple-300'"
-                    class="w-8 h-8 rounded-full bg-purple-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                    class="w-8 h-8 rounded-full bg-purple-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
                     :class="{'ring-2 ring-offset-2 ring-purple-500': newEvent.class === 'bg-purple-300'}"
                   ></button>
                 </div>
               </fieldset>
             </div>
             
-            <!-- Added API Error Message -->
-            <div v-if="apiError" class="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+            <!-- Error Message -->
+            <div v-if="apiError" class="p-3 bg-red-100 text-red-700 rounded-md text-sm">
               {{ apiError }}
             </div>
-            
-            <div class="flex items-center justify-end space-x-3">
-              <button 
-                type="button"
-                id="cancel-button"
-                name="cancel-button"
-                @click="closeCreateModal" 
-                class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300"
-              >
-                Cancel
-              </button>
-              <button 
-                type="submit" 
-                id="submit-button"
-                name="submit-button"
-                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300"
-                :disabled="isSubmitting"
-              >
-                {{ isSubmitting ? 'Creating...' : 'Create Event' }}
-              </button>
-            </div>
           </form>
+        </div>
+        
+        <!-- Form Actions - Fixed at bottom -->
+        <div class="p-4 border-t bg-gray-50 flex items-center justify-end space-x-3 rounded-b-lg">
+          <button 
+            type="button"
+            @click="closeCreateModal" 
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition duration-300 text-sm"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="submitEvent"
+            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition duration-300 flex items-center text-sm"
+            :disabled="isSubmitting"
+          >
+            <svg v-if="isSubmitting" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ isSubmitting ? 'Creating...' : 'Create Event' }}
+          </button>
         </div>
       </div>
     </div>
@@ -283,20 +309,30 @@
 import MapPicker from './MapPicker.vue';
 import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
-// Uncomment this import since you have the auth utilities
 import { isAuthenticated as checkAuth, parseJwt } from '../utils/auth';
 
+// State variables
 const searchQuery = ref('');
 const showCreateModal = ref(false);
 const isSubmitting = ref(false);
 const isAuthenticated = ref(false);
 const userToken = ref('');
-
-// Add new state variables for better error handling
 const apiError = ref(null);
-const isLoading = ref(false);
+const showMapPicker = ref(false);
+const mapPickerRef = ref(null);
+const selectedLocation = ref(null);
 
-// Initialize new event data with description
+// Category handling
+const availableCategories = [
+  'social', 'business', 'education', 'sports', 'entertainment', 'other'
+];
+
+const formatCategoryName = (category) => {
+  if (!category) return '';
+  return category.charAt(0).toUpperCase() + category.slice(1);
+};
+
+// Event form data
 const newEvent = ref({
   title: '',
   description: '',
@@ -304,141 +340,60 @@ const newEvent = ref({
   end: '',
   class: 'bg-purple-300',
   type: 'private',
+  category: 'social',
+  location: '',
   latitude: '',
   longitude: '',
-  address: ''
 });
 
-const showMapPicker = ref(false);
-const mapPickerRef = ref(null);
-const selectedLocation = ref(null);
-
+// Location handling
 const handleLocationSelected = ({ coordinates, address }) => {
-  // Set the location in the form
   newEvent.value.location = address;
   
-  // Store the GeoJSON formatted location
   selectedLocation.value = {
     type: "Point",
-    coordinates: [coordinates[1], coordinates[0]], // [longitude, latitude] for GeoJSON
+    coordinates: [coordinates[1], coordinates[0]],
     address: address
   };
   
-  // Close the map picker
   showMapPicker.value = false;
-  
-  // Debug
-  console.log("Location selected:", coordinates, address);
-};
-
-// Add this function near your validateDates function in the <script setup> section
-const validateCoordinates = () => {
-  // If we have a selected location from the map, it's valid
-  if (selectedLocation.value) {
-    return true;
-  }
-  
-  // If we have a text location but no coordinates, we'll try geocoding in submitEvent
-  if (newEvent.value.location) {
-    return true;
-  }
-  
-  // If individual lat/lng were provided (legacy code), validate them
-  if (!newEvent.value.latitude && !newEvent.value.longitude) {
-    return true;  // Both empty is fine (location is optional)
-  }
-  
-  // Parse the values to check if they're valid numbers
-  const lat = parseFloat(newEvent.value.latitude);
-  const lng = parseFloat(newEvent.value.longitude);
-  
-  if (isNaN(lat) || isNaN(lng)) {
-    apiError.value = 'Coordinates must be valid numbers';
-    return false;
-  }
-  
-  // Check if values are in valid ranges
-  if (lat < -90 || lat > 90) {
-    apiError.value = 'Latitude must be between -90 and 90';
-    return false;
-  }
-  
-  if (lng < -180 || lng > 180) {
-    apiError.value = 'Longitude must be between -180 and 180';
-    return false;
-  }
-  
-  return true;
-};
-
-const confirmLocation = () => {
-  if (mapPickerRef.value) {
-    console.log("Confirming location, ref exists");
-    
-    if (mapPickerRef.value.selectedLocation && mapPickerRef.value.selectedAddress) {
-      // Directly access the MapPicker's selected location and address
-      handleLocationSelected({
-        coordinates: mapPickerRef.value.selectedLocation,
-        address: mapPickerRef.value.selectedAddress
-      });
-      return true;
-    } else {
-      console.warn("No location selected in map picker");
-      alert('Please select a location on the map first by clicking on it');
-      return false;
-    }
-  } else {
-    console.error("Map picker reference not available");
-    return false;
-  }
 };
 
 const openMapPicker = () => {
   showMapPicker.value = true;
   
-  // If they've typed an address, search for it when the map opens
   nextTick(() => {
     if (mapPickerRef.value && newEvent.value.location) {
       mapPickerRef.value.searchQuery = newEvent.value.location;
-      // Use optional chaining to avoid errors if searchLocation doesn't exist
       mapPickerRef.value.searchLocation?.();
     }
   });
 };
 
+// Define confirmLocation before using it in defineExpose
+const confirmLocation = () => {
+  if (mapPickerRef.value && mapPickerRef.value.selectedLocation && mapPickerRef.value.selectedAddress) {
+    handleLocationSelected({
+      coordinates: mapPickerRef.value.selectedLocation,
+      address: mapPickerRef.value.selectedAddress
+    });
+    return true;
+  } else {
+    alert('Please select a location on the map first by clicking on it');
+    return false;
+  }
+};
+
+// Move defineExpose AFTER function definitions
+const emit = defineEmits(['search', 'eventCreated']);
+
+// Now expose methods to parent components
 defineExpose({
   confirmLocation,
   searchQuery 
 });
 
-const emit = defineEmits(['search', 'eventCreated']);
-
-onMounted(() => {
-  // Use the auth utility for checking authentication
-  isAuthenticated.value = checkAuth();
-  
-  if (isAuthenticated.value) {
-    const token = localStorage.getItem('token');
-    userToken.value = token;
-    
-    // Use the parseJwt utility to get user info
-    const userData = parseJwt(token);
-    if (userData) {
-      console.log('Authenticated as:', userData.username);
-    }
-  }
-});
-
-const emitSearch = () => {
-  emit('search', searchQuery.value);
-};
-
-const clearSearch = () => {
-  searchQuery.value = '';
-  emit('search', '');
-};
-
-// Date validation function
+// Validation functions
 const validateDates = () => {
   const startDate = new Date(newEvent.value.start);
   const endDate = new Date(newEvent.value.end);
@@ -451,18 +406,51 @@ const validateDates = () => {
   return true;
 };
 
-// Open create event modal
+const validateCoordinates = () => {
+  if (selectedLocation.value || newEvent.value.location) {
+    return true;
+  }
+  
+  if (!newEvent.value.latitude && !newEvent.value.longitude) {
+    return true;
+  }
+  
+  const lat = parseFloat(newEvent.value.latitude);
+  const lng = parseFloat(newEvent.value.longitude);
+  
+  if (isNaN(lat) || isNaN(lng)) {
+    apiError.value = 'Coordinates must be valid numbers';
+    return false;
+  }
+  
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    apiError.value = 'Coordinates are out of valid range';
+    return false;
+  }
+  
+  return true;
+};
+
+// Search functions
+const emitSearch = () => {
+  emit('search', searchQuery.value);
+};
+
+const clearSearch = () => {
+  searchQuery.value = '';
+  emit('search', '');
+};
+
+// Modal functions
 const openCreateEventModal = () => {
-  // Reset any previous errors
   apiError.value = null;
   
-  // Check if user is authenticated
   if (!isAuthenticated.value) {
     alert('Please log in to create events');
     return;
   }
   
-  // Set default start and end times
+  // Set default times
   const now = new Date();
   const startDate = new Date(now);
   startDate.setMinutes(Math.ceil(now.getMinutes() / 15) * 15);
@@ -470,15 +458,8 @@ const openCreateEventModal = () => {
   const endDate = new Date(startDate);
   endDate.setHours(endDate.getHours() + 1);
   
-  // Format for datetime-local input
   const formatForInput = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   };
   
   newEvent.value = {
@@ -488,9 +469,10 @@ const openCreateEventModal = () => {
     end: formatForInput(endDate),
     class: 'bg-purple-300',
     type: 'private',
+    category: 'social',
+    location: '',
     latitude: '',
     longitude: '',
-    address: ''
   };
   
   showCreateModal.value = true;
@@ -499,8 +481,10 @@ const openCreateEventModal = () => {
 const closeCreateModal = () => {
   showCreateModal.value = false;
   apiError.value = null;
+  selectedLocation.value = null;
+  showMapPicker.value = false;
+  isSubmitting.value = false;
   
-  // Reset form state and clear any selections
   newEvent.value = {
     title: '',
     description: '',
@@ -508,19 +492,14 @@ const closeCreateModal = () => {
     end: '',
     class: 'bg-purple-300',
     type: 'private',
+    category: 'social',
     location: '',
     latitude: '',
     longitude: '',
-    address: ''
   };
-  
-  // Reset other related state
-  selectedLocation.value = null;
-  showMapPicker.value = false;
-  isSubmitting.value = false;
 };
 
-// Create a new event with improved error handling
+// Form submission
 const submitEvent = async () => {
   if (!checkAuth()) {
     alert('You must be logged in to create events');
@@ -541,30 +520,24 @@ const submitEvent = async () => {
   
   try {
     // Format dates for API
-    const formatDateForApi = (dateString) => {
-      return new Date(dateString).toISOString();
-    };
+    const formatDateForApi = (dateString) => new Date(dateString).toISOString();
     
-    // Create the basic event data
+    // Create event data
     const eventData = {
       title: newEvent.value.title,
       description: newEvent.value.description || "",
       start: formatDateForApi(newEvent.value.start),
       end: formatDateForApi(newEvent.value.end),
       class: newEvent.value.class,
-      type: newEvent.value.type
+      type: newEvent.value.type,
+      category: newEvent.value.category
     };
     
-    // Add location data if we have it from the map picker
+    // Handle location data
     if (selectedLocation.value) {
-      // Use the selectedLocation object directly since it's already formatted correctly
       eventData.location = selectedLocation.value;
-      console.log('Using selected location:', selectedLocation.value);
-    }
-    // If we don't have location data but have an address, try to geocode it
-    else if (newEvent.value.location) {
+    } else if (newEvent.value.location) {
       try {
-        console.log('Geocoding address:', newEvent.value.location);
         const response = await axios.get('https://nominatim.openstreetmap.org/search', {
           params: {
             q: newEvent.value.location,
@@ -580,17 +553,13 @@ const submitEvent = async () => {
             coordinates: [parseFloat(result.lon), parseFloat(result.lat)],
             address: newEvent.value.location
           };
-          console.log('Geocoded location:', eventData.location);
         }
       } catch (error) {
         console.error('Error geocoding address:', error);
-        // Continue without location if geocoding fails
       }
     }
     
-    console.log('Sending event data:', JSON.stringify(eventData, null, 2));
-    
-    // Use the fetch API like in the test function for consistency
+    // Submit event to API
     const token = localStorage.getItem('token');
     const response = await fetch('https://eventium-backend.onrender.com/events', {
       method: 'POST',
@@ -601,39 +570,38 @@ const submitEvent = async () => {
       body: JSON.stringify(eventData)
     });
     
-    // Check if request was successful
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Error ${response.status}: ${errorText}`);
     }
     
-    // Parse the response
     const result = await response.json();
-    console.log('Event created successfully:', result);
-    
-    // Emit event with the newly created event data
     emit('eventCreated', result.event);
     
-    // Success - explicitly reset state before closing modal
     isSubmitting.value = false;
-    
-    // Call closeCreateModal to properly reset and close the modal
     closeCreateModal();
     
   } catch (error) {
     console.error('Error creating event:', error);
-    
-    // Handle error responses
-    if (error.message) {
-      apiError.value = error.message;
-    } else {
-      apiError.value = 'Failed to create event. Please try again.';
-    }
-    
-    // Make sure to set isSubmitting to false even if there's an error
+    apiError.value = error.message || 'Failed to create event. Please try again.';
     isSubmitting.value = false;
   }
 };
+
+// Lifecycle hooks
+onMounted(() => {
+  isAuthenticated.value = checkAuth();
+  
+  if (isAuthenticated.value) {
+    const token = localStorage.getItem('token');
+    userToken.value = token;
+    
+    const userData = parseJwt(token);
+    if (userData) {
+      console.log('Authenticated as:', userData.username);
+    }
+  }
+});
 </script>
 
 <style scoped>
@@ -657,5 +625,31 @@ const submitEvent = async () => {
 .leaflet-control-geosearch input {
   flex-grow: 1;
   padding: 8px;
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d1d1;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Fix for mobile date inputs */
+@media (max-width: 640px) {
+  input[type="datetime-local"] {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
 }
 </style>

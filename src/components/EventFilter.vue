@@ -17,6 +17,25 @@
       </select>
     </div>
     
+    <!-- Category filter -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Categories</label>
+      <div class="space-y-2 mt-2">
+        <div v-for="category in availableCategories" :key="category" class="flex items-center">
+          <input
+            type="checkbox"
+            :id="`category-${category}`"
+            :value="category"
+            v-model="localSelectedCategories"
+            class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 h-4 w-4"
+          />
+          <label :for="`category-${category}`" class="ml-2 block text-gray-700">
+            {{ formatCategoryName(category) }}
+          </label>
+        </div>
+      </div>
+    </div>
+    
     <!-- Location filter -->
     <div class="mb-4">
       <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
@@ -42,9 +61,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 
-// Props to receive from parent - removed selectedCategories prop
+// Props to receive from parent
 const props = defineProps({
   dateFilter: {
     type: String,
@@ -54,44 +73,66 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  selectedCategories: {
+    type: Array,
+    default: () => []
+  },
   events: {
     type: Array,
     default: () => []
   }
 });
 
-// Emits for communicating with parent - removed update:selectedCategories
-const emit = defineEmits(['update:dateFilter', 'update:locationFilter', 'filter-changed']);
+// Emits for communicating with parent
+const emit = defineEmits(['update:dateFilter', 'update:locationFilter', 'update:selectedCategories', 'filter-changed']);
 
-// Local reactive copies of the props - removed localSelectedCategories
+// Local reactive copies of the props
 const localDateFilter = ref(props.dateFilter);
 const localLocationFilter = ref(props.locationFilter);
+const localSelectedCategories = ref(props.selectedCategories);
 
-// Clear all filters - removed clearing selectedCategories
+// Available categories
+const availableCategories = [
+  'social', 'business', 'education', 'sports', 'entertainment', 'other'
+];
+
+// Format category names for display (capitalize first letter)
+const formatCategoryName = (category) => {
+  if (!category) return '';
+  return category.charAt(0).toUpperCase() + category.slice(1);
+};
+
+// Clear all filters
 const clearFilters = () => {
   localDateFilter.value = 'all';
   localLocationFilter.value = '';
+  localSelectedCategories.value = [];
   
   // Emit updates
   emitChanges();
 };
 
-// Watch for changes in local values and emit updates - removed watch for localSelectedCategories
+// Watch for changes in local values and emit updates
 watch(localDateFilter, () => emitChanges());
 watch(localLocationFilter, () => emitChanges());
+watch(localSelectedCategories, () => emitChanges());
 
-// Watch for prop changes to update local values - removed watch for props.selectedCategories
+// Watch for prop changes to update local values
 watch(() => props.dateFilter, (newVal) => {
   localDateFilter.value = newVal;
 });
 watch(() => props.locationFilter, (newVal) => {
   localLocationFilter.value = newVal;
 });
+watch(() => props.selectedCategories, (newVal) => {
+  localSelectedCategories.value = [...newVal];
+});
 
-// Emit updates to parent - removed update:selectedCategories emit
+// Emit updates to parent
 const emitChanges = () => {
   emit('update:dateFilter', localDateFilter.value);
   emit('update:locationFilter', localLocationFilter.value);
+  emit('update:selectedCategories', localSelectedCategories.value);
   emit('filter-changed');
 };
 </script>
