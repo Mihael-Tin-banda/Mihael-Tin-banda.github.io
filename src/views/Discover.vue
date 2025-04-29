@@ -1,14 +1,30 @@
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen overflow-hidden">
     
+    <!-- MAIN CONTENT AREA -->
     <div class="lg:col-span-3 flex flex-col max-h-screen overflow-hidden">
-      <!-- Fixed header section -->
+      <!-- Header -->
       <div class="flex-none p-3">
-        <h1 class="font-bold text-4xl md:text-5xl text-gray-800 mb-6">
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Discover</span>
-        </h1>
-
-        <!-- Search component with enhanced styling -->
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="font-bold text-4xl md:text-5xl text-gray-800">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">Discover</span>
+          </h1>
+          
+          <!-- Mobile filter button -->
+          <button 
+            @click="showMobileFilter = true" 
+            class="lg:hidden flex items-center space-x-1 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200 text-gray-700 hover:bg-gray-50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span class="text-sm font-medium">Filter</span>
+            <span v-if="hasActiveFilters" class="bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {{ activeFilterCount }}
+            </span>
+          </button>
+        </div>
+        
         <Search 
           @search="updateSearch" 
           @event-created="handleEventCreated" 
@@ -16,14 +32,15 @@
         />
       </div>
       
-      <!-- Scrollable events section -->
+      <!-- Events List -->
       <div class="flex-grow overflow-y-auto pr-2 pb-20">
-        <!-- Loading indicator -->
+        <!-- Loading State -->
         <div v-if="loading" class="text-center py-12 bg-white rounded-xl shadow-md p-8">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto"></div>
           <p class="text-gray-500 mt-4">Loading events...</p>
         </div>
         
+        <!-- Empty State -->
         <div v-else-if="filteredEvents.length === 0" class="bg-white rounded-xl shadow-md p-8 text-center">
           <div class="bg-gray-100 p-4 inline-block rounded-full mb-6">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -36,17 +53,18 @@
           </p>
         </div>
 
+        <!-- Event Cards Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-3">
           <div v-for="event in filteredEvents" :key="event._id" class="bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden">
-            <!-- Event card content remains unchanged -->
             <div class="h-2" :class="event.class"></div>
             <div class="p-5">
+              <!-- Event Title -->
               <div class="flex items-center mb-3">
                 <span class="w-3 h-3 rounded-full mr-2" :class="event.class"></span>
                 <h2 class="text-lg font-medium text-gray-900 truncate">{{ event.title }}</h2>
               </div>
               
-              <!-- Add Category Badge -->
+              <!-- Category Badge -->
               <div v-if="event.category" class="mb-3">
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" 
                   :class="{
@@ -64,7 +82,7 @@
                 </span>
               </div>
               
-              <!-- Rest of your event card content -->
+              <!-- Event Times -->
               <div class="mb-3 flex items-center text-sm text-gray-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -79,6 +97,7 @@
                 <span>{{ formatDate(event.end) }}</span>
               </div>
               
+              <!-- Author and Join Status -->
               <div class="flex items-center mb-4">
                 <div class="flex items-center flex-grow">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,6 +111,7 @@
                 </div>
               </div>
               
+              <!-- Action Buttons -->
               <div class="flex justify-end space-x-2">
                 <button 
                   v-if="isAuthenticated && !hasJoinedEvent(event._id)"
@@ -119,11 +139,13 @@
       </div>
     </div>
 
+    <!-- MODALS -->
     <!-- Event Details Modal -->
     <div v-if="selectedEvent" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto overflow-hidden">
         <div class="h-2" :class="selectedEvent.class"></div>
         <div class="p-6">
+          <!-- Modal Header -->
           <div class="flex justify-between items-start">
             <div class="flex items-center">
               <span class="w-4 h-4 rounded-full mr-2" :class="selectedEvent.class"></span>
@@ -136,7 +158,9 @@
             </button>
           </div>
           
+          <!-- Modal Content -->
           <div class="mt-4">
+            <!-- Event Times -->
             <div class="flex items-center mb-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -150,7 +174,7 @@
               <span class="text-gray-700">End: {{ formatDate(selectedEvent.end) }}</span>
             </div>
             
-            <!-- Add Category Badge to Event Details Modal -->
+            <!-- Category Badge -->
             <div v-if="selectedEvent.category" class="mb-3">
               <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" 
                 :class="{
@@ -168,6 +192,7 @@
               </span>
             </div>
             
+            <!-- Description -->
             <div :class="{ hidden: selectedEvent.description?.length === 0 }" class="flex flex-col mb-4">
               <span class="text-gray-700 font-bold mb-2">Description</span>
               <div class="text-gray-700 bg-gray-50 rounded-lg border border-gray-100 p-4">
@@ -175,9 +200,9 @@
               </div>
             </div>
 
+            <!-- Location Map -->
             <div v-if="selectedEvent.location?.coordinates" class="flex flex-col mb-4">
               <span class="text-gray-700 font-bold mb-2">Location</span>
-              <!-- Mini map -->
               <div class="h-48 rounded-lg overflow-hidden shadow-md">
                 <LocationMap 
                   :coordinates="[selectedEvent.location.coordinates[1], selectedEvent.location.coordinates[0]]"
@@ -187,6 +212,7 @@
               </div>
             </div>
             
+            <!-- Author Info -->
             <div v-if="selectedEvent.authorName" class="flex items-center mb-4 p-3 bg-gray-50 rounded-lg">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -194,6 +220,7 @@
               <span class="text-gray-700">Created by: {{ selectedEvent.authorName }}</span>
             </div>
             
+            <!-- Join Status -->
             <div v-if="hasJoinedEvent(selectedEvent._id)" class="flex items-center p-3 mb-4 bg-green-50 rounded-lg border border-green-100 text-green-700">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -202,6 +229,7 @@
             </div>
           </div>
           
+          <!-- Modal Actions -->
           <div class="mt-6 flex justify-end space-x-3">
             <button 
               v-if="isAuthenticated && !hasJoinedEvent(selectedEvent._id) && selectedEvent.type === 'public'"
@@ -239,11 +267,13 @@
       <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-auto overflow-hidden">
         <div class="h-2 bg-green-500"></div>
         <div class="p-6">
+          <!-- Loading State -->
           <div v-if="joinLoading" class="text-center py-8">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700 mx-auto"></div>
             <p class="text-gray-700 mt-4">Joining event...</p>
           </div>
           
+          <!-- Error State -->
           <div v-else-if="joinError" class="text-center py-8">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -256,6 +286,7 @@
             </button>
           </div>
           
+          <!-- Success State -->
           <div v-else-if="joinSuccess" class="text-center py-8">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -269,6 +300,7 @@
             </button>
           </div>
           
+          <!-- Confirmation State -->
           <div v-else>
             <h3 class="text-xl font-bold text-gray-800 mb-4">Join this event?</h3>
             <p class="text-gray-600 mb-6">
@@ -295,15 +327,75 @@
       </div>
     </div>
 
-    <!-- SIDEBAR COMPONENTS (Similar to Home view) -->
+    <!-- SIDEBAR -->
     <div class="hidden lg:block lg:col-span-1 lg:overflow-y-auto max-h-screen z-0">
       <EventFilter
-        v-model:dateFilter="dateFilter"
-        v-model:selectedCategories="selectedCategories"
-        v-model:locationFilter="locationFilter"
+        :dateFilter="dateFilter"
+        :selectedCategories="selectedCategories"
+        :locationFilter="locationFilter"
+        @update:dateFilter="updateDateFilter"
+        @update:selectedCategories="updateSelectedCategories"
+        @update:locationFilter="updateLocationFilter"
         @filter-changed="applyFilters"
       />
-
+    </div>
+    
+    <!-- Mobile Filter Panel -->
+    <div 
+      v-if="showMobileFilter" 
+      class="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
+      @click="showMobileFilter = false"
+    >
+      <div 
+        class="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
+        @click.stop
+      >
+        <div class="flex flex-col h-full">
+          <!-- Filter Header -->
+          <div class="flex items-center justify-between p-4 border-b">
+            <h3 class="font-medium text-lg text-gray-800">Filters</h3>
+            <button 
+              @click="showMobileFilter = false" 
+              class="text-gray-500 hover:text-gray-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Filter Content -->
+          <div class="flex-grow overflow-y-auto p-4">
+            <EventFilter
+              :dateFilter="dateFilter"
+              :selectedCategories="selectedCategories"
+              :locationFilter="locationFilter"
+              @update:dateFilter="updateDateFilter"
+              @update:selectedCategories="updateSelectedCategories"
+              @update:locationFilter="updateLocationFilter"
+              @filter-changed="applyFilters"
+            />
+          </div>
+          
+          <!-- Filter Actions -->
+          <div class="border-t p-4">
+            <div class="grid grid-cols-2 gap-3">
+              <button 
+                @click="clearAllFilters" 
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition duration-300"
+              >
+                Clear All
+              </button>
+              <button 
+                @click="applyFiltersAndCloseModal" 
+                class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition duration-300"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -314,38 +406,42 @@ import Search from '../components/Search.vue';
 import LocationMap from '../components/LocationMap.vue';
 import axios from 'axios';
 import { onMounted, ref, computed } from 'vue';
-import { parseJwt, isAuthenticated } from '../utils/auth'; // Update the path as needed
+import { parseJwt, isAuthenticated } from '../utils/auth';
 
+// --- STATE MANAGEMENT ---
 const events = ref([]);
 const selectedEvent = ref(null);
 const searchQuery = ref('');
 const loading = ref(true);
 const joinedEvents = ref([]);
 
+// Filter states
 const dateFilter = ref('all');
 const selectedCategories = ref([]);
 const locationFilter = ref('');
+const showMobileFilter = ref(false);
 
-// User authentication state
+// Authentication states
 const userToken = ref('');
 const userId = ref('');
 
-// Join event functionality
+// Join event states
 const joiningEvent = ref(null);
 const joinLoading = ref(false);
 const joinError = ref(null);
 const joinSuccess = ref(false);
 
-// Computed property for public events
+// --- COMPUTED PROPERTIES ---
+// Public events only
 const publicEvents = computed(() => {
   return events.value.filter(event => event.type === "public");
 });
 
-// Computed property for filtered events - COMBINED VERSION
+// Filtered events based on all criteria
 const filteredEvents = computed(() => {
   let filtered = publicEvents.value;
   
-  // Apply search query filtering
+  // Search query filtering
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase().trim();
     filtered = filtered.filter(event => 
@@ -353,7 +449,7 @@ const filteredEvents = computed(() => {
     );
   }
   
-  // Apply date filtering
+  // Date filtering
   if (dateFilter.value !== 'all') {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -384,14 +480,14 @@ const filteredEvents = computed(() => {
     });
   }
   
-  // Apply category filtering
+  // Category filtering
   if (selectedCategories.value.length > 0) {
     filtered = filtered.filter(event => 
       event.category && selectedCategories.value.includes(event.category)
     );
   }
   
-  // Apply location filtering
+  // Location filtering
   if (locationFilter.value.trim()) {
     const location = locationFilter.value.toLowerCase().trim();
     filtered = filtered.filter(event => 
@@ -403,39 +499,40 @@ const filteredEvents = computed(() => {
   return filtered;
 });
 
-// Add a method to handle filter changes
-const applyFilters = () => {
-  console.log('Filters applied:', {
-    date: dateFilter.value,
-    categories: selectedCategories.value,
-    location: locationFilter.value
-  });
-};
+const hasActiveFilters = computed(() => {
+  return dateFilter.value !== 'all' || 
+         locationFilter.value.trim() !== '' || 
+         selectedCategories.value.length > 0;
+});
 
-// Rest of your code remains unchanged
+// Count active filters for the badge
+const activeFilterCount = computed(() => {
+  let count = 0;
+  if (dateFilter.value !== 'all') count++;
+  if (locationFilter.value.trim() !== '') count++;
+  count += selectedCategories.value.length;
+  return count;
+});
 
+// --- LIFECYCLE HOOKS ---
 onMounted(async () => {
-  // Check if user is authenticated
+  // Check authentication
   const token = localStorage.getItem('token');
   if (token) {
     isAuthenticated.value = true;
     userToken.value = token;
     
-    // Use the safer token parsing approach
     const decoded = parseJwt(token);
     if (decoded && decoded.id) {
       userId.value = decoded.id;
-      // Fetch joined events if authenticated
       await fetchJoinedEvents();
-    } else {
-      console.warn('Invalid token or missing user ID');
     }
   }
   
-  // Fetch all events
   await fetchEvents();
 });
 
+// --- API FUNCTIONS ---
 async function fetchEvents() {
   loading.value = true;
   try {
@@ -466,25 +563,7 @@ async function fetchJoinedEvents() {
   }
 }
 
-const updateSearch = (query) => {
-  searchQuery.value = query;
-};
-
-const openEventDetails = (event) => {
-  selectedEvent.value = event;
-};
-
-const closeModal = () => {
-  selectedEvent.value = null;
-};
-
-// Handle newly created event
-const handleEventCreated = (newEvent) => {
-  events.value.push(newEvent);
-};
-
-// Delete the selected event
-const deleteSelectedEvent = async () => {
+async function deleteSelectedEvent() {
   if (!confirm('Are you sure you want to delete this event?')) {
     return;
   }
@@ -500,9 +579,25 @@ const deleteSelectedEvent = async () => {
     console.error('Error deleting event:', error);
     alert('Failed to delete event. Please try again.');
   }
+}
+
+// --- EVENT HANDLERS ---
+const updateSearch = (query) => {
+  searchQuery.value = query;
 };
 
-// Format date for display
+const openEventDetails = (event) => {
+  selectedEvent.value = event;
+};
+
+const closeModal = () => {
+  selectedEvent.value = null;
+};
+
+const handleEventCreated = (newEvent) => {
+  events.value.push(newEvent);
+};
+
 const formatDate = (dateString) => {
   if (!dateString) return '';
 
@@ -520,7 +615,42 @@ const formatDate = (dateString) => {
   }
 };
 
-// Join event functionality
+// --- FILTER FUNCTIONS ---
+const updateDateFilter = (value) => {
+  dateFilter.value = value;
+};
+
+const updateLocationFilter = (value) => {
+  locationFilter.value = value;
+};
+
+const updateSelectedCategories = (value) => {
+  selectedCategories.value = [...value];
+};
+
+// Clear all filters
+const clearAllFilters = () => {
+  dateFilter.value = 'all';
+  locationFilter.value = '';
+  selectedCategories.value = [];
+  applyFilters();
+};
+
+// Apply filters with loading indicator
+const applyFilters = () => {
+  loading.value = true;
+  setTimeout(() => {
+    loading.value = false;
+  }, 100);
+};
+
+// Apply filters and close mobile filter modal
+const applyFiltersAndCloseModal = () => {
+  applyFilters();
+  showMobileFilter.value = false;
+};
+
+// --- JOIN EVENT FUNCTIONS ---
 const joinEvent = (event) => {
   if (!isAuthenticated.value) {
     alert('Please log in to join events');
@@ -552,7 +682,6 @@ const confirmJoin = async () => {
     
     joinSuccess.value = true;
     
-    // Update joined events
     if (response.data.event) {
       joinedEvents.value.push(response.data.event);
     }
@@ -569,30 +698,23 @@ const finishJoin = () => {
   closeModal();
 };
 
-// Check if user has already joined this event
+// --- UTILITY FUNCTIONS ---
 const hasJoinedEvent = (eventId) => {
   return joinedEvents.value.some(event => event.originalEventId === eventId);
 };
 
-// Check if user can delete an event
 const canDeleteEvent = (event) => {
   if (!isAuthenticated.value || !event) return false;
-  
-  // User can delete if they are the author
   return event.author === userId.value;
 };
 
-// Format coordinates for map display
 const formatCoordinates = (coordinates) => {
   if (!coordinates || !Array.isArray(coordinates) || coordinates.length !== 2) {
     return 'Location unavailable';
   }
-  
-  // Format as latitude, longitude with 6 decimal places
   return `${coordinates[1].toFixed(6)}, ${coordinates[0].toFixed(6)}`;
 };
 
-// Add the formatCategoryName function if it doesn't exist
 const formatCategoryName = (category) => {
   if (!category) return 'Other';
   return category.charAt(0).toUpperCase() + category.slice(1);
@@ -621,5 +743,15 @@ const formatCategoryName = (category) => {
 .h-screen {
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
+}
+
+/* Slide animation for mobile filter panel */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.fixed .absolute {
+  animation: slideInRight 0.3s forwards;
 }
 </style>
